@@ -40,5 +40,10 @@ for subscriber in tqdm(a_list):
 
 
 #FINISH
+<<<<<<< HEAD
 print("second try")
+=======
+print('commit test')
+print('commit test2')
+>>>>>>> master
 print_the_end()
