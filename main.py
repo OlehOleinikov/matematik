@@ -40,4 +40,5 @@ for subscriber in tqdm(a_list):
 
 
 #FINISH
+print('commit test')
 print_the_end()
