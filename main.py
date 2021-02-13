@@ -40,4 +40,5 @@ for subscriber in tqdm(a_list):
 
 
 #FINISH
+print("second try")
 print_the_end()
