@@ -1,0 +1,26 @@
+<RCC>
+  <qresource prefix="pics">
+    <file>gui_res/ico_mathman.ico</file>
+    <file>gui_res/ico_map.ico</file>
+    <file>gui_res/ico_links.ico</file>
+    <file>gui_res/ico_meet.ico</file>
+    <file>gui_res/ico_mon.ico</file>
+    <file>gui_res/ico_pair.ico</file>
+    <file>gui_res/ico_single_abon.ico</file>
+    <file>gui_res/ico_albert.ico</file>
+    <file>gui_res/math_logo opas.png</file>
+    <file>gui_res/ico_analyze_single.ico</file>
+    <file>gui_res/ico_sheets.ico</file>
+    <file>gui_res/math_logo.png</file>
+  </qresource>
+  <qresource prefix="BW">
+    <file>gui_res/ico_import.ico</file>
+    <file>gui_res/ico_links.ico</file>
+    <file>gui_res/ico_meet2.ico</file>
+    <file>gui_res/ico_mon.ico</file>
+    <file>gui_res/ico_pair2.ico</file>
+    <file>gui_res/ico_route.ico</file>
+    <file>gui_res/ico_single2.ico</file>
+    <file>gui_res/ico_two.ico</file>
+  </qresource>
+</RCC>
