@@ -9,28 +9,52 @@ from analyst.analyst_engine import analysis_type_a
 from tqdm import tqdm
 
 # **************************************PROGRAM STARTING*****************************************
-prog_execute_stage = 0  # етапи роботи для відображення активності кнопок (до перегону, після перегону)
-input_files_default_headers_set = ['Шлях', 'Файл', 'Розмір', 'Відбиток', 'Колонок', 'Типів', 'Записів',
-                                   'Абонентів А/Б', 'IMEI', 'Зон/антен', 'Визначений тип']
-test_data =  [
-            ['1', '2'],
-            ['1', '2', '3']
-            ]
+prog_execute_stage = 0  # етапи програми для відображення активності елементів (до перегону, після перегону), глобальна
 
+# Змінна списку файлів, обраних користувачем для опрацювання, з їх властивостями:
+# (містить список списків для подальшої роботи з конвертування таблиць, їх розпізнання та експорту -
+# 0) повний шлях з найменуванням файлу
+# 1) найменування файлу з розширенням
+# 2) розмір файлу у строковому форматі "{%d} Kb"
+# 3) "відбиток" файлу, що являє строку "{найменування з розширенням[1]} + " " + {розмір[2]}" для перевірки повторного
+# додавання файлу до списку (наприклад дублікат файлу з іншої директорії)
+
+# Наступні елементи списку додаються за результатами опрацювання файлів:
+# 4) кількість виявлених записів, що будуть включені до експорту
+# 5) розпізнано колонок
+# 6) виявлено колонок
+# 7) потрійний запис абонентів (необхідність визначення дійсного абонента Б)
+# 8) необхідність підключення зовнішній довідників БС (відсутність розшифрування адрес БС)
+# 9) необхідність розділення АБ (АБ тип - наявні відомості про ІМЕІ та/або місцезнаходження Б)
+# 10) розпізнано типів
+# 11) виявлено типів
+# 12) абонентів А унікальних у файлі
+# 13) абонентів Б унікальних у файлі
+# 14) ІМЕІ А унікальних у файлі
+# 15) ІМЕІ Б унікальних у файлі (для АБ деталізацій, в інших випадках - 0)
+# 16) унікальних територіальних зон LAC
+# 17) унікальних базових станцій LAC+Cid
+# 18) унікальних базових станцій LAC+Cid, які мають розшифрування адреси БС (для КС після опрацювання довідником)
+# 19) лог опрацювання файлу для відображення у вікні результатів
 availible_sheets_list = []
+
+# Заголовки колонок відображення обраних до опрацювання файлів (для використання у моделі даних Qt):
+input_files_default_headers_set = ['Шлях', 'Файл', 'Розмір', 'Відбиток', 'Записів', 'Колонок', 'Типів',
+                                   'Абонентів А/Б', 'IMEI', 'Зон/антен', 'Визначений тип']
+
+# Консольні функції (підлягають видаленню після переходу на GUI)
 colorama.init()
-
 print_logo()
-
-
 # print_program_description()
 # dialog_user_start()
 
+
+# Визначення моделі даних для відображення списку файлів
 class ModelSheetsListView(QtCore.QAbstractTableModel):
     def __init__(self, parent, columns_headers, input_data):
         QtCore.QAbstractTableModel.__init__(self)
         self.gui = parent
-        for row in input_data:
+        for row in input_data:  # додавання порожніх клітинок для уникнення помилки IndexError при відображенні
             if len(row) < len(columns_headers):
                 while len(row) < len(columns_headers):
                     row.append("-")
@@ -61,17 +85,16 @@ class ModelSheetsListView(QtCore.QAbstractTableModel):
         return QtCore.QVariant()
 
 
-class MyWin(QtWidgets.QMainWindow):
+class MainWinMatematik(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
-        # Активність віджетів в залежності від етапу виконнаня програми (підготовка до перегону/ робота з опрацьованими
+        self.ui.statusbar.showMessage('Математик: програма завантажена...')
+        # Активність елементів в залежності від етапу виконнаня програми (підготовка до перегону/ робота з опрацьованими
         # файлами) - залежить від статусу змінної prog_execute_stage:
         if prog_execute_stage > 0:
             self.ui.btn_sheet_add.setDisabled(True)
-            self.ui.btn_sheet_remove.setDisabled(True)
             self.ui.btn_sheet_clear_list.setDisabled(True)
             self.ui.btn_sheet_import_def_dir.setDisabled(True)
             self.ui.btn_sheet_start_convert.setDisabled(True)
@@ -80,18 +103,57 @@ class MyWin(QtWidgets.QMainWindow):
             self.ui.btn_excel_save.setDisabled(True)
             self.ui.groupBox_3.setDisabled(True)
             self.ui.groupBox_4.setDisabled(True)
-        # Кнопки роботи зі списком файлів, що готуються до завантаження:
-        self.ui.btn_sheet_add.clicked.connect(self.add_sheet_dialog)
+        self.ui.btn_sheet_remove.setEnabled(False)  # кнопка активується якщо є виділені рядки списку файлів
 
-        # Підготовка форми таблиці для файлів обраних користувачем (для правильного відображення у віджеті
-        # tableView необхідно підготувати форму даних за допомогою класу QAbstractTableModel):
+        # ------------------------------------------------------------------------------------------------------------
+        # Підготовка форми таблиці для файлів обраних користувачем (для правильного відображення у віджеті------------
+        # tableView необхідно підготувати форму даних за допомогою класу QAbstractTableModel):------------------------
+        # ------------------------------------------------------------------------------------------------------------
         self.widget_sheets_table_view = self.ui.tableView_import_files_list  # змінна безпосередньо віджету
-        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view, input_files_default_headers_set, availible_sheets_list)  # об'єкт моделі даних
+        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view, input_files_default_headers_set,
+                                                      availible_sheets_list)  # об'єкт моделі даних
         self.widget_sheets_table_view.setModel(self.sheets_view_object)  # застосування моделі до віджету
+        # мінімізація висоти рядків:
         tv_vertical_header_setting = self.widget_sheets_table_view.verticalHeader()
         tv_vertical_header_setting.setDefaultSectionSize(10)
         tv_vertical_header_setting.sectionResizeMode(QtWidgets.QSizePolicy.Fixed)
+        # розтягування заголовків колонок відповідно ширини вікна таблиці (список файлів до опрацювання)
         self.widget_sheets_table_view.horizontalHeader().setStretchLastSection(True)
+
+        # -----------------------Кнопки роботи зі списком файлів, що готуються до завантаження:
+        # Додати файли:
+        self.ui.btn_sheet_add.clicked.connect(self.add_sheet_dialog)
+        # Очистити список файлів для опрацювання:
+        self.ui.btn_sheet_clear_list.clicked.connect(self.clear_sheets_list)
+        # Активувати кнопку видалення, якщо файл виділено в таблиці
+        self.widget_sheets_table_view.clicked.connect(self.remove_btn_update)
+        # Видалити виділений файл з таблиці (також видаляється з availible_sheets_list)
+        self.ui.btn_sheet_remove.clicked.connect(self.remove_sheet_from_list)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # -----------------------------------------МЕТОДИ КЛАСУ MainWinMatematik--------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
+    def remove_btn_update (self):  # активність кнопки видалення залежно від наявності виділеного рядку
+        if self.widget_sheets_table_view.selectionModel().hasSelection():
+            self.ui.btn_sheet_remove.setEnabled(True)
+        else:
+            self.ui.btn_sheet_remove.setEnabled(False)
+
+    def remove_sheet_from_list(self):  # видалення інформації з таблиці обраних файлів (тільки до перегону)
+        global availible_sheets_list
+        if prog_execute_stage==0 and self.widget_sheets_table_view.selectionModel().hasSelection():
+            index = (self.widget_sheets_table_view.selectionModel().currentIndex())
+            number_to_remove = index.row()
+            if len(availible_sheets_list) > number_to_remove:
+                availible_sheets_list.pop(number_to_remove)
+                self.update_sheets_list()
+                self.ui.btn_sheet_remove.setEnabled(False)
+
+    def update_sheets_list(self):  # оновлення таблиці для відображення (коли змінюється availible_sheets_list)
+        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view,
+                                                      input_files_default_headers_set, availible_sheets_list)
+        self.widget_sheets_table_view.setModel(self.sheets_view_object)
+        self.widget_sheets_table_view.update()
 
     # Вікно додавання файлів для опрацювання (деталізації абонентів або моніторингу). Отримує список обраних файлів
     # визначає їх розмір та перевіряє чи вже не доданий кожен з файлів раніше. Після перевірки додає відомсоті про файл
@@ -123,10 +185,21 @@ class MyWin(QtWidgets.QMainWindow):
         # У вкладений список sheets_list_prepared додаємо файли, які обрав користувач, та яких ще немає у списку,
         # перевірка на повторення через file_footprint (назва файлу з його розміром)
 
+    def clear_sheets_list(self):
+        global availible_sheets_list
+        availible_sheets_list = []
+        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view, input_files_default_headers_set,
+                                                      availible_sheets_list)
+        self.widget_sheets_table_view.setModel(self.sheets_view_object)
+        self.ui.btn_sheet_remove.setEnabled(False)
 
+
+# -----------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------ВИКОНАННЯ ПРОГРАМИ------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    myapp = MyWin()
+    myapp = MainWinMatematik()
     myapp.show()
     sys.exit(app.exec_())
 
