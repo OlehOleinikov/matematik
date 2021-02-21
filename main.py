@@ -10,10 +10,14 @@ from tqdm import tqdm
 
 # **************************************PROGRAM STARTING*****************************************
 prog_execute_stage = 0  # етапи роботи для відображення активності кнопок (до перегону, після перегону)
-availible_sheets_list = [['Шлях'], ['Файл'], ['Розмір'], ['Відбиток']], [[[0], [1], [2], [3]]]
+input_files_default_headers_set = ['Шлях', 'Файл', 'Розмір', 'Відбиток', 'Колонок', 'Типів', 'Записів',
+                                   'Абонентів А/Б', 'IMEI', 'Зон/антен', 'Визначений тип']
+test_data =  [
+            ['1', '2'],
+            ['1', '2', '3']
+            ]
 
-# availible_sheets_list = [['Шлях'], ['Файл'], ['Розмір'], ['Відбиток'], ['Колонок'], ['Типів'], ['Записів'],
-#                          ['Абонентів А/Б'], ['IMEI'], ['Зон/антен'], ['Визначений тип']]
+availible_sheets_list = []
 colorama.init()
 
 print_logo()
@@ -21,6 +25,40 @@ print_logo()
 
 # print_program_description()
 # dialog_user_start()
+
+class ModelSheetsListView(QtCore.QAbstractTableModel):
+    def __init__(self, parent, columns_headers, input_data):
+        QtCore.QAbstractTableModel.__init__(self)
+        self.gui = parent
+        for row in input_data:
+            if len(row) < len(columns_headers):
+                while len(row) < len(columns_headers):
+                    row.append("-")
+        self.colLabels = columns_headers
+        self.cached = input_data
+
+    def rowCount(self, parent):
+        return len(self.cached)
+
+    def columnCount(self, parent):
+        return len(self.colLabels)
+
+    def data(self, index, role):
+        if not index.isValid():
+            return QtCore.QVariant()
+        elif role != QtCore.Qt.DisplayRole and role != QtCore.Qt.EditRole:
+            return QtCore.QVariant()
+        value = ''
+        if role == QtCore.Qt.DisplayRole:
+            row = index.row()
+            col = index.column()
+            value = self.cached[row][col]
+        return QtCore.QVariant(value)
+
+    def headerData(self, section, orientation, role):
+        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+            return QtCore.QVariant(self.colLabels[section])
+        return QtCore.QVariant()
 
 
 class MyWin(QtWidgets.QMainWindow):
@@ -48,9 +86,16 @@ class MyWin(QtWidgets.QMainWindow):
         # Підготовка форми таблиці для файлів обраних користувачем (для правильного відображення у віджеті
         # tableView необхідно підготувати форму даних за допомогою класу QAbstractTableModel):
         self.widget_sheets_table_view = self.ui.tableView_import_files_list  # змінна безпосередньо віджету
-        self.sheets_view_object = ModelSheetsListView(availible_sheets_list)  # об'єкт моделі даних
+        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view, input_files_default_headers_set, availible_sheets_list)  # об'єкт моделі даних
         self.widget_sheets_table_view.setModel(self.sheets_view_object)  # застосування моделі до віджету
+        tv_vertical_header_setting = self.widget_sheets_table_view.verticalHeader()
+        tv_vertical_header_setting.setDefaultSectionSize(10)
+        tv_vertical_header_setting.sectionResizeMode(QtWidgets.QSizePolicy.Fixed)
+        self.widget_sheets_table_view.horizontalHeader().setStretchLastSection(True)
 
+    # Вікно додавання файлів для опрацювання (деталізації абонентів або моніторингу). Отримує список обраних файлів
+    # визначає їх розмір та перевіряє чи вже не доданий кожен з файлів раніше. Після перевірки додає відомсоті про файл
+    # в змінну (список списків) availible_sheets_list:
     def add_sheet_dialog(self):
         global availible_sheets_list
         incoming_sheets_list = availible_sheets_list
@@ -66,36 +111,17 @@ class MyWin(QtWidgets.QMainWindow):
             if file_footprint in [results[3] for results in incoming_sheets_list]:
                 pass
             else:
-                incoming_sheets_list.append(file_path, file_name, file_size, file_footprint)
+                incoming_sheets_list.append([file_path, file_name, file_size, file_footprint])
         availible_sheets_list = incoming_sheets_list
         print(incoming_sheets_list)
+        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view, input_files_default_headers_set,
+                                                      availible_sheets_list)
+        self.widget_sheets_table_view.setModel(self.sheets_view_object)
+        self.widget_sheets_table_view.resizeColumnToContents(1)
+        self.widget_sheets_table_view.resizeColumnToContents(0)
+        self.widget_sheets_table_view.resizeColumnToContents(2)
         # У вкладений список sheets_list_prepared додаємо файли, які обрав користувач, та яких ще немає у списку,
         # перевірка на повторення через file_footprint (назва файлу з його розміром)
-
-
-class ModelSheetsListView(QtCore.QAbstractTableModel):
-    def __init__(self, input_data):
-        super(ModelSheetsListView, self).__init__()
-        self._data = input_data
-
-    def __del__(self):
-        pass
-
-    def data(self, index, role):
-        if role == Qt.DisplayRole:
-            # See below for the nested-list data structure.
-            # .row() indexes into the outer list,
-            # .column() indexes into the sub-list
-            return self._data[index.row()][index.column()]
-
-    def rowCount(self, index):
-        # The length of the outer list.
-        return len(self._data)
-
-    def columnCount(self, index):
-        # The following takes the first sub-list, and returns
-        # the length (only works if all rows are an equal length)
-        return len(self._data[0])
 
 
 if __name__ == '__main__':

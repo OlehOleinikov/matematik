@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import gui.res_file_rc
 
 
 class Ui_MainWindow(object):
@@ -83,6 +84,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_import_field_and_but = QtWidgets.QHBoxLayout()
         self.horizontalLayout_import_field_and_but.setObjectName("horizontalLayout_import_field_and_but")
         self.tableView_import_files_list = QtWidgets.QTableView(self.tab_converter)
+        self.tableView_import_files_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.tableView_import_files_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.tableView_import_files_list.setObjectName("tableView_import_files_list")
         self.horizontalLayout_import_field_and_but.addWidget(self.tableView_import_files_list)
         self.verticalLayout_import_buttons = QtWidgets.QVBoxLayout()
@@ -138,6 +141,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.setContentsMargins(5, 5, 5, 5)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.groupBox_4 = QtWidgets.QGroupBox(self.tab_converter)
+        self.groupBox_4.setEnabled(False)
         self.groupBox_4.setMinimumSize(QtCore.QSize(0, 50))
         self.groupBox_4.setMaximumSize(QtCore.QSize(130, 16777215))
         self.groupBox_4.setObjectName("groupBox_4")
@@ -182,6 +186,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_7.addLayout(self.verticalLayout_6)
         self.horizontalLayout_6.addWidget(self.groupBox_4)
         self.groupBox_3 = QtWidgets.QGroupBox(self.tab_converter)
+        self.groupBox_3.setEnabled(False)
         self.groupBox_3.setMaximumSize(QtCore.QSize(150, 16777215))
         self.groupBox_3.setObjectName("groupBox_3")
         self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.groupBox_3)
@@ -218,6 +223,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.groupBox_3)
         self.verticalLayout_5.addLayout(self.horizontalLayout_6)
         self.btn_excel_save = QtWidgets.QPushButton(self.tab_converter)
+        self.btn_excel_save.setEnabled(False)
         self.btn_excel_save.setMaximumSize(QtCore.QSize(200, 16777213))
         self.btn_excel_save.setAutoFillBackground(False)
         self.btn_excel_save.setObjectName("btn_excel_save")
@@ -312,4 +318,4 @@ class Ui_MainWindow(object):
         self.tab_main.setTabText(self.tab_main.indexOf(self.tab_routes), _translate("MainWindow", "Побудова маршруту"))
         self.tab_main.setTabText(self.tab_main.indexOf(self.tab_monitoring), _translate("MainWindow", "Робота з моніторингом"))
         self.tab_main.setTabText(self.tab_main.indexOf(self.tab_graph), _translate("MainWindow", "Розрахунок схеми"))
-import gui.res_file_rc
+
