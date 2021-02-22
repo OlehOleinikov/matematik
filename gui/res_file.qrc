@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="pics">
+    <file>gui_res/ico_ser.ico</file>
     <file>gui_res/ico_mathman.ico</file>
     <file>gui_res/ico_map.ico</file>
     <file>gui_res/ico_links.ico</file>
