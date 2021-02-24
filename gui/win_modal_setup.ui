@@ -6,9 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>427</width>
-    <height>487</height>
+    <width>465</width>
+    <height>573</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>465</width>
+    <height>573</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>465</width>
+    <height>573</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>465</width>
+    <height>573</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Налаштування</string>
@@ -19,7 +37,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QTabWidget" name="tabSetting">
+     <property name="baseSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="currentIndex">
       <number>2</number>
      </property>
@@ -229,7 +253,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_setup_columns">
+     <widget class="QWidget" name="tab_setup_types">
       <attribute name="title">
        <string>Типи</string>
       </attribute>
@@ -244,8 +268,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>385</width>
-            <height>271</height>
+            <width>423</width>
+            <height>307</height>
            </rect>
           </property>
           <attribute name="label">
@@ -283,7 +307,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_30">
+                 <widget class="QLineEdit" name="lineEdit_exportname_voice_in">
                   <property name="text">
                    <string>вх</string>
                   </property>
@@ -292,10 +316,10 @@
                </layout>
               </item>
               <item>
-               <widget class="QListView" name="listView_14"/>
+               <widget class="QListView" name="listView_voice_in"/>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_31"/>
+               <widget class="QLineEdit" name="lineEdit_add_voice_in"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_44">
@@ -313,14 +337,14 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_27">
+                 <widget class="QPushButton" name="btn_add_voice_in">
                   <property name="text">
                    <string>Додати</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_28">
+                 <widget class="QPushButton" name="btn_remove_voice_in">
                   <property name="text">
                    <string>Видалити</string>
                   </property>
@@ -375,7 +399,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_28">
+                 <widget class="QLineEdit" name="lineEdit_exportname_voice_out">
                   <property name="text">
                    <string>вих</string>
                   </property>
@@ -384,10 +408,10 @@
                </layout>
               </item>
               <item>
-               <widget class="QListView" name="listView_13"/>
+               <widget class="QListView" name="listView_voice_out"/>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_29"/>
+               <widget class="QLineEdit" name="lineEdit_add_voice_out"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_42">
@@ -405,14 +429,14 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_25">
+                 <widget class="QPushButton" name="btn_add_voice_out">
                   <property name="text">
                    <string>Додати</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_26">
+                 <widget class="QPushButton" name="btn_remove_voice_out">
                   <property name="text">
                    <string>Видалити</string>
                   </property>
@@ -443,8 +467,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>467</width>
-            <height>307</height>
+            <width>385</width>
+            <height>271</height>
            </rect>
           </property>
           <attribute name="label">
@@ -482,7 +506,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_34">
+                 <widget class="QLineEdit" name="lineEdit_exportname_message_in">
                   <property name="text">
                    <string>вх СМС</string>
                   </property>
@@ -491,10 +515,10 @@
                </layout>
               </item>
               <item>
-               <widget class="QListView" name="listView_16"/>
+               <widget class="QListView" name="listView_message_in"/>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_35"/>
+               <widget class="QLineEdit" name="lineEdit_add_message_in"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_49">
@@ -512,14 +536,14 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_31">
+                 <widget class="QPushButton" name="btn_add_message_in">
                   <property name="text">
                    <string>Додати</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_32">
+                 <widget class="QPushButton" name="btn_remove_message_in">
                   <property name="text">
                    <string>Видалити</string>
                   </property>
@@ -574,7 +598,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_32">
+                 <widget class="QLineEdit" name="lineEdit_exportname_message_out">
                   <property name="text">
                    <string>вих СМС</string>
                   </property>
@@ -583,10 +607,10 @@
                </layout>
               </item>
               <item>
-               <widget class="QListView" name="listView_15"/>
+               <widget class="QListView" name="listView_message_out"/>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_33"/>
+               <widget class="QLineEdit" name="lineEdit_add_message_out"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_47">
@@ -604,14 +628,14 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_29">
+                 <widget class="QPushButton" name="btn_add_message_out">
                   <property name="text">
                    <string>Додати</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_30">
+                 <widget class="QPushButton" name="btn_remove_message_out">
                   <property name="text">
                    <string>Видалити</string>
                   </property>
@@ -638,6 +662,14 @@
           </layout>
          </widget>
          <widget class="QWidget" name="page_3">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>407</width>
+            <height>293</height>
+           </rect>
+          </property>
           <attribute name="label">
            <string>Переадресація та інтернет</string>
           </attribute>
@@ -673,7 +705,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_36">
+                 <widget class="QLineEdit" name="lineEdit_exportname_network">
                   <property name="text">
                    <string>інтернет</string>
                   </property>
@@ -682,10 +714,10 @@
                </layout>
               </item>
               <item>
-               <widget class="QListView" name="listView_17"/>
+               <widget class="QListView" name="listView_network"/>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_37"/>
+               <widget class="QLineEdit" name="lineEdit_add_network"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_52">
@@ -703,14 +735,14 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_33">
+                 <widget class="QPushButton" name="btn_add_network">
                   <property name="text">
                    <string>Додати</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_34">
+                 <widget class="QPushButton" name="btn_remove_network">
                   <property name="text">
                    <string>Видалити</string>
                   </property>
@@ -765,7 +797,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_38">
+                 <widget class="QLineEdit" name="lineEdit_exportname_forwarding">
                   <property name="text">
                    <string>переад</string>
                   </property>
@@ -774,10 +806,10 @@
                </layout>
               </item>
               <item>
-               <widget class="QListView" name="listView_18"/>
+               <widget class="QListView" name="listView_forwarding"/>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_39"/>
+               <widget class="QLineEdit" name="lineEdit_add_forwarding"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_54">
@@ -795,14 +827,14 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_35">
+                 <widget class="QPushButton" name="btn_add_forwarding">
                   <property name="text">
                    <string>Додати</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_36">
+                 <widget class="QPushButton" name="btn_remove_forwarding">
                   <property name="text">
                    <string>Видалити</string>
                   </property>
@@ -855,7 +887,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_27">
+          <widget class="QLineEdit" name="lineEdit_exportname_unknowntypes">
            <property name="minimumSize">
             <size>
              <width>60</width>
@@ -897,7 +929,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_setup_columns">
       <attribute name="title">
        <string>Колонки</string>
       </attribute>
@@ -913,7 +945,7 @@
             <x>0</x>
             <y>0</y>
             <width>385</width>
-            <height>340</height>
+            <height>293</height>
            </rect>
           </property>
           <attribute name="label">
@@ -936,12 +968,12 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="comboBox"/>
+              <widget class="QComboBox" name="comboBox_choose_import_column"/>
              </item>
             </layout>
            </item>
            <item>
-            <widget class="QListView" name="listView"/>
+            <widget class="QListView" name="listView_keywords_col_replace"/>
            </item>
            <item>
             <widget class="QLabel" name="label_6">
@@ -951,7 +983,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit"/>
+            <widget class="QLineEdit" name="lineEdit_add_keyword_column"/>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -969,14 +1001,14 @@
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="btn_add_keyword_column">
                <property name="text">
                 <string>Додати</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="btn_remove_keyword_column">
                <property name="text">
                 <string>Видалити</string>
                </property>
@@ -1004,8 +1036,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>385</width>
-            <height>140</height>
+            <width>423</width>
+            <height>426</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1013,77 +1045,37 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <item>
-              <widget class="QLabel" name="label_7">
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>25</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Тип колонки:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox_2"/>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
-             <item>
-              <widget class="QLabel" name="label_8">
-               <property name="minimumSize">
-                <size>
-                 <width>90</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>25</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Підпис у таблиці:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="lineEdit_2"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_3">
-               <property name="text">
-                <string>Застосувати</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QTableWidget" name="table_columns_exportnames">
+             <attribute name="horizontalHeaderDefaultSectionSize">
+              <number>100</number>
+             </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>25</number>
+             </attribute>
+             <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderStretchLastSection">
+              <bool>false</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Тип колонки</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Підпис у вихідному файлі</string>
+              </property>
+             </column>
+            </widget>
            </item>
           </layout>
          </widget>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>60</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>

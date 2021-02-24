@@ -1,5 +1,9 @@
 import sys
 from gui.gui import *
+from gui.gui_settings import *
+from config.config_math import config_swipe, config_load, config_save, config_add_item, config_change_item, \
+    config_remove_item
+
 from PyQt5.QtCore import Qt
 
 import colorama
@@ -90,7 +94,7 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.statusbar.showMessage('Математик: програма завантажена...')
+        self.ui.statusbar.showMessage('Математик: Готовий до імпорту файлів...')
         # Активність елементів в залежності від етапу виконнаня програми (підготовка до перегону/ робота з опрацьованими
         # файлами) - залежить від статусу змінної prog_execute_stage:
         if prog_execute_stage > 0:
@@ -129,6 +133,12 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         self.widget_sheets_table_view.clicked.connect(self.remove_btn_update)
         # Видалити виділений файл з таблиці (також видаляється з availible_sheets_list)
         self.ui.btn_sheet_remove.clicked.connect(self.remove_sheet_from_list)
+
+        self.ui.btn_settings_win.clicked.connect(self.open_modalwin_settings)
+
+    def open_modalwin_settings(self):
+        window = SettingsWindow(self)
+        window.show()
 
     # ------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------МЕТОДИ КЛАСУ MainWinMatematik--------------------------------------------
@@ -193,6 +203,24 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         self.widget_sheets_table_view.setModel(self.sheets_view_object)
         self.ui.btn_sheet_remove.setEnabled(False)
 
+
+class SettingsWindow(QtWidgets.QWidget):
+    def __init__(self, parent=MainWinMatematik):
+        super().__init__(parent, QtCore.Qt.Window)
+        self.open_modalwin_settings = Ui_Form()
+        self.open_modalwin_settings.setupUi(self)
+        self.setWindowModality(2)
+        self.open_modalwin_settings.btn_config_swipe.clicked.connect(config_swipe)
+        self.open_modalwin_settings.btn_config_load.clicked.connect(self.choose_file_load_config)
+        self.open_modalwin_settings.btn_config_save.clicked.connect(self.choose_file_save_config)
+        
+    def choose_file_load_config(self):
+        file = QtWidgets.QFileDialog.getOpenFileName(self, 'Завантаження налаштувань', '', 'Файл конфігурації (*.ini)')
+        config_load(file[0])
+
+    def choose_file_save_config(self):
+        file = QtWidgets.QFileDialog.getSaveFileName(self, 'Збереження налаштувань', '', 'Файл конфігурації (*.ini)')
+        config_save(file[0])
 
 # -----------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------ВИКОНАННЯ ПРОГРАМИ------------------------------------------------

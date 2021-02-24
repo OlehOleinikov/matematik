@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1007</width>
-    <height>795</height>
+    <width>987</width>
+    <height>801</height>
    </rect>
   </property>
   <property name="contextMenuPolicy">
@@ -321,7 +321,7 @@
                 <number>5</number>
                </property>
                <item>
-                <widget class="QPlainTextEdit" name="plainTextEdit">
+                <widget class="QPlainTextEdit" name="plainTextEdit_status_file_convert">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                    <horstretch>0</horstretch>
@@ -373,7 +373,7 @@
                 <number>5</number>
                </property>
                <item>
-                <widget class="QPlainTextEdit" name="plainTextEdit_2">
+                <widget class="QPlainTextEdit" name="plainTextEdit_status_bs_voc">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                    <horstretch>0</horstretch>
@@ -401,7 +401,7 @@
              <widget class="QGroupBox" name="groupBox_6">
               <property name="maximumSize">
                <size>
-                <width>300</width>
+                <width>450</width>
                 <height>250</height>
                </size>
               </property>
@@ -439,6 +439,110 @@
                   <number>0</number>
                  </property>
                  <item>
+                  <widget class="QGroupBox" name="groupBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>130</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="title">
+                    <string>Включити до файлів</string>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_3">
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_include_typedate">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Тип та дата</string>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_include_time">
+                      <property name="text">
+                       <string>Час</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_include_dur">
+                      <property name="text">
+                       <string>Тривалість</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_include_sim_a">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Абонент А</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_include_imei">
+                      <property name="text">
+                       <string>ІМЕІ</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_include_sim_b">
+                      <property name="text">
+                       <string>Абонент Б</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_include_laccid">
+                      <property name="text">
+                       <string>LAC/Cid</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_include_adr_az">
+                      <property name="text">
+                       <string>Азимут та БС</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QGroupBox" name="groupBox_4">
                    <property name="enabled">
                     <bool>false</bool>
@@ -451,7 +555,7 @@
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>130</width>
+                     <width>150</width>
                      <height>200</height>
                     </size>
                    </property>
@@ -463,6 +567,18 @@
                      <layout class="QVBoxLayout" name="verticalLayout_6">
                       <property name="spacing">
                        <number>5</number>
+                      </property>
+                      <property name="leftMargin">
+                       <number>2</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>2</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>2</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>2</number>
                       </property>
                       <item>
                        <widget class="QRadioButton" name="radio_period_export_all">
@@ -739,7 +855,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1007</width>
+     <width>987</width>
      <height>21</height>
     </rect>
    </property>

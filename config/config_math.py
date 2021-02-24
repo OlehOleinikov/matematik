@@ -1,9 +1,52 @@
 from configparser import ConfigParser
 
-default_config = ConfigParser()
+current_config = ConfigParser()  # об'єкт конфігурації
+current_config.read('config\\config.ini')
 
-default_config['import_folder_default'] = {'path':''}
 
+def config_swipe():
+    with open('config\\config.ini', 'w') as x:
+        default_config.write(x)
+    current_config.clear()
+    current_config.read('config\\config.ini')
+    print('settings restored to default')
+
+
+def config_save(file):
+    with open(file, 'w') as y:
+        current_config.write(y)
+    print('settings saved to file:' + file)
+
+
+def config_load(file):
+    current_config.read(file)
+    with open('config\\config.ini', 'w') as z:
+        current_config.write(z)
+    print('settings loaded from file:' + str(file))
+
+
+def config_add_item():
+    pass
+
+
+def config_remove_item():
+    pass
+
+
+def config_change_item():
+    pass
+
+
+# -----------------------------------------------------------------------------
+# -----------------СТАНДАРТНІ НАЛАШТУВАННЯ КОНВЕРТЕРУ (КОНФІГ)-----------------
+# -----------------------------------------------------------------------------
+
+default_config = ConfigParser()  # об'єкт конфігурації (використовується для відновлення до "заводських" налаштувань
+
+# шлях до папки, з якої можна швидко імпортувати усі файли (визначається користувачем)
+default_config['import_folder_default'] = {'path': ''}
+
+# підписи типів у результуючому файлі:
 default_config['types_con_main_display_names'] = {
     'voice_in': 'вх',
     'voice_out': 'вих',
@@ -14,6 +57,7 @@ default_config['types_con_main_display_names'] = {
     'unknown': 'переад'
     }
 
+# підписи колонок у результуючому файлі:
 default_config['columns_export_names'] = {
     'type': 'Тип',
     'date': 'Дата',
@@ -33,6 +77,7 @@ default_config['columns_export_names'] = {
     'adr_b': 'Адреса Б'
     }
 
+# види колонок, які можуть бути в імпортованому файлі та їх підписи в інтерфейсі GUI:
 default_config['columns_incoming_names'] = {
     'type': 'Тип з\'єднання',
     'date': 'Дата',
@@ -61,7 +106,7 @@ default_config['columns_incoming_names'] = {
     'ip': 'Окрема колонка ІР-адреси',
     'column_ignore': 'Список колонок для ігнорування програмою'
 }
-
+# нумерований список типів з'єднань (можливо краще видалити цей проміжний етап):
 default_config['types_con_main_enum'] = {
     'voice_in': '1',
     'voice_out': '2',
@@ -72,6 +117,7 @@ default_config['types_con_main_enum'] = {
     'unknown': '7'
     }
 
+# інвертування типів для зміни абонентів А та Б місцями:
 default_config['types_con_main_invert_rules'] = {
     'voice_in': 'voice_out',
     'voice_out': 'voice_in',
@@ -82,6 +128,7 @@ default_config['types_con_main_invert_rules'] = {
     'unknown': 'unknown'
     }
 
+# суфікс ідентифікатора БС (у деяких випадках), потребує заміну на відповідну цифру:
 default_config['azimuth_sufix'] = {
     '-a': '1',
     '-b': '2',
@@ -93,98 +140,107 @@ default_config['azimuth_sufix'] = {
     '-h': '8'
     }
 
+# типові розділювачі у випадку злиття адреси БС та азимуту в одній колонці:
 default_config['azimuth_splitters'] = {
     ' \\ ': 'True',
     ' / ': 'True',
     ', AZ=': 'True',
     }
 
+# --------------------------------------ТИПИ РОЗПІЗНАННЯ---------------------------------------------
+# список розпізнання типу - інтернет
 default_config['types_dict_network'] = {
-    'gprsCall': '5',
-    'aval - pos': '5',
-    'bkc': '5',
-    'garagegps': '5',
-    'internet': '5',
-    'lifestatus': '5',
-    'mms': '5',
-    'nodata': '5',
-    'obp': '5',
-    'pb': '5',
-    'pumb': '5',
-    'raxel': '5',
-    'yavir': '5',
-    'GGSN': '5',
-    'GPRS': '5',
-    'GPRS.': '5'
+    'gprsCall': 'network',
+    'aval - pos': 'network',
+    'bkc': 'network',
+    'garagegps': 'network',
+    'internet': 'network',
+    'lifestatus': 'network',
+    'mms': 'network',
+    'nodata': 'network',
+    'obp': 'network',
+    'pb': 'network',
+    'pumb': 'network',
+    'raxel': 'network',
+    'yavir': 'network',
+    'GGSN': 'network',
+    'GPRS': 'network',
+    'GPRS.': 'network'
     }
 
+# список розпізнання типу - вихідний дзвінок:
 default_config['types_dict_voice_out'] = {
-    'Вих.': '2',
-    'Вихідний': '2',
-    'Исх': '2',
-    'Исх.': '2',
-    'Исходящий': '2',
-    'Исходящий звонок': '2',
-    'вих': '2',
-    'moc': '2',
-    'mocAttempt': '2',
-    'emergencyCall': '2',
-    'исх.звон.': '2',
-    'OutgoingCallAttempt': '2',
-    'ISDN - Исходящий': '2',
-    'исх.0': '2'
+    'Вих.': 'voice_out',
+    'Вихідний': 'voice_out',
+    'Исх': 'voice_out',
+    'Исх.': 'voice_out',
+    'Исходящий': 'voice_out',
+    'Исходящий звонок': 'voice_out',
+    'вих': 'voice_out',
+    'moc': 'voice_out',
+    'mocAttempt': 'voice_out',
+    'emergencyCall': 'voice_out',
+    'исх.звон.': 'voice_out',
+    'OutgoingCallAttempt': 'voice_out',
+    'ISDN - Исходящий': 'voice_out',
+    'исх.0': 'voice_out'
     }
 
+# список розпізнання типу - вихідне повідомлення:
 default_config['types_dict_message_out'] = {
-    'Исходящее SMS': '4',
-    'вих СМС': '4',
-    'mocSMS': '4',
-    'SMS_MO': '4',
-    'исх.SMS': '4',
-    'Исходящее SMS в роуминге': '4',
-    'Вихідне SMS': '4'
+    'Исходящее SMS': 'message_out',
+    'вих СМС': 'message_out',
+    'mocSMS': 'message_out',
+    'SMS_MO': 'message_out',
+    'исх.SMS': 'message_out',
+    'Исходящее SMS в роуминге': 'message_out',
+    'Вихідне SMS': 'message_out'
     }
 
+# список розпізнання типу - вхідний дзвінок:
 default_config['types_dict_voice_in'] = {
-    'вх': '1',
-    'вх.': '1',
-    'вхідний': '1',
-    'вхідний виклик': '1',
-    'входящий ': '1',
-    'входящий звонок': '1',
-    'mtc': '1',
-    'mtcAttempt': '1',
-    'входящий': '1',
-    'вх.звон.': '1',
-    'Входящий звонок к роумеру': '1',
-    'IncomingCall': '1',
-    'выз.к роум.': '1',
-    'вх.0': '1',
+    'вх': 'voice_in',
+    'вх.': 'voice_in',
+    'вхідний': 'voice_in',
+    'вхідний виклик': 'voice_in',
+    'входящий ': 'voice_in',
+    'входящий звонок': 'voice_in',
+    'mtc': 'voice_in',
+    'mtcAttempt': 'voice_in',
+    'вх.звон.': 'voice_in',
+    'Входящий звонок к роумеру': 'voice_in',
+    'IncomingCall': 'voice_in',
+    'выз.к роум.': 'voice_in',
+    'вх.0': 'voice_in',
     }
 
+# список розпізнання типу - вхідне повідомлення:
 default_config['types_dict_message_in'] = {
-    'Входящее SMS': '3',
-    'вх СМС': '3',
-    'mtcSMS': '3',
-    'SMS_MT': '3',
-    'вх.SMS': '3',
-    'MMS': '3',
-    'mtcMMS': '3',
-    'Вхідне SMS': '3'
+    'Входящее SMS': 'message_in',
+    'вх СМС': 'message_in',
+    'mtcSMS': 'message_in',
+    'SMS_MT': 'message_in',
+    'вх.SMS': 'message_in',
+    'MMS': 'message_in',
+    'mtcMMS': 'message_in',
+    'Вхідне SMS': 'message_in',
     }
 
+# список розпізнання типу - переадресація:
 default_config['types_dict_forwarding'] = {
-    'callForwardingAttempt' : '6',
-    'transitAttempt' : '6',
-    'callForwarding' : '6',
-    'неопредел.': '6',
-    'переадрес.': '6',
-    'Переадресация': '6',
-    'переадр.': '6',
-    'переад': '6',
-    'Переадресація': '6'
+    'callForwardingAttempt': 'forwarding',
+    'transitAttempt': 'forwarding',
+    'callForwarding': 'forwarding',
+    'неопредел.': 'forwarding',
+    'переадрес.': 'forwarding',
+    'Переадресация': 'forwarding',
+    'переадр.': 'forwarding',
+    'переад': 'forwarding',
+    'Переадресація': 'forwarding'
     }
 
+# ------------------------------------------КОЛОНКИ РОЗПІЗНАННЯ------------------------------------
+# список розпізнання колонки - адреса БС абонента А
 default_config['columns_dict_adr_a'] = {
     'Address': 'adr_a',
     'Adres': 'adr_a',
@@ -204,12 +260,14 @@ default_config['columns_dict_adr_a'] = {
     'Адрес расположения базовой станции и азимут': 'adr_a',
     'Адреса розташування базової станції та азимут': 'adr_a'}
 
+# список розпізнання колонки - адреса БС абонента Б:
 default_config['columns_dict_adr_b'] = {
     'Адреса Б': 'adr_b',
     'Адреса БС Б': 'adr_b',
     'Адресс Б': 'adr_b',
     'Сота B': 'adr_b'}
 
+# список розпізнання колонки - азимут БС абонента А:
 default_config['columns_dict_az_a'] = {
     'az': 'az_a',
     'az.': 'az_a',
@@ -222,10 +280,12 @@ default_config['columns_dict_az_a'] = {
     'азимут': 'az_a',
     'Азимут A': 'az_a'}
 
+# список розпізнання колонки - азимут БС абонента Б:
 default_config['columns_dict_az_b'] = {
     'Аз.Б': 'az_b',
     'Азимут B': 'az_b'}
 
+# список розпізнання колонки - номер БС (Сід) абонента А:
 default_config['columns_dict_cid_a'] = {
     'CELL': 'cid_a',
     'CELLID': 'cid_a',
@@ -236,13 +296,16 @@ default_config['columns_dict_cid_a'] = {
     'Ідентифікатор (Cell ID)': 'cid_a',
     'Номер БС': 'cid_a'}
 
+# список розпізнання колонки - номер БС (Сід) абонента Б:
 default_config['columns_dict_cid_b'] = {
     'CID B': 'cid_b',
     'CID Б': 'cid_b'}
 
+# список розпізнання колонки - Дата:
 default_config['columns_dict_date'] = {
     'дата': 'date'}
 
+# список розпізнання колонки - Дата та час:
 default_config['columns_dict_date_time'] = {
     'CALL_DATE_TIME': 'date_time',
     'STARTTIME': 'date_time',
@@ -252,6 +315,7 @@ default_config['columns_dict_date_time'] = {
     'Дата та час з\'єднання': 'date_time',
     'Нач звон': 'date_time'}
 
+# список розпізнання колонки - Тривалість:
 default_config['columns_dict_dur'] = {
     'длител.(сек.)': 'dur',
     'длительность': 'dur',
@@ -261,6 +325,7 @@ default_config['columns_dict_dur'] = {
     'тривалість': 'dur',
     'Тривалість з\'єднання (сек.)': 'dur'}
 
+# список розпізнання колонки - ІМЕІ абонента А:
 default_config['columns_dict_imei_a'] = {
     'Imei': 'imei_a',
     'IMEI A': 'imei_a',
@@ -271,11 +336,13 @@ default_config['columns_dict_imei_a'] = {
     'ІМЕІ A': 'imei_a',
     'ІМЕІ А': 'imei_a'}
 
+# список розпізнання колонки - ІМЕІ абонента Б:
 default_config['columns_dict_imei_b'] = {
     'IMEI B': 'imei_b',
     'IMEI Б': 'imei_b',
     'ІМЕІ Б': 'imei_b'}
 
+#  список розпізнання колонок, що не мають значення для роботи конвертеру (додаткові):
 default_config['columns_dict_other'] = {
     'IMSI': 'imsi',
     'Ip': 'ip',
@@ -284,6 +351,7 @@ default_config['columns_dict_other'] = {
     'IP-Address доступу в Internet': 'ip',
     'Мережа': 'network'}
 
+# список розпізнання колонки - зони (регіону, ЛАК) абонента А:
 default_config['columns_dict_lac_a'] = {
     'AREA': 'lac_a',
     'lac': 'lac_a',
@@ -292,13 +360,16 @@ default_config['columns_dict_lac_a'] = {
     'Код регіону (Local Area Code)': 'lac_a',
     'Регіон БС': 'lac_a'}
 
+# список розпізнання колонки - зони (регіону, ЛАК) абонента Б:
 default_config['columns_dict_lac_b'] = {
     'LAC B': 'lac_b',
     'LAC Б': 'lac_b'}
 
+# список розпізнання колонки - в якій поєднано ЛАК та Сід -  абонента А
 default_config['columns_dict_lac_cid'] = {
     'Код региона-идентификатор базовой станции (LAC-CellID)': 'lac_cid'}
 
+# список розпізнання колонки - Абонент А (основний номер):
 default_config['columns_dict_sim_a'] = {
     'MSISDN': 'sim_a',
     'SIM A': 'sim_a',
@@ -310,6 +381,7 @@ default_config['columns_dict_sim_a'] = {
     'Номер': 'sim_a',
     'Тел. А': 'sim_a'}
 
+# список розпізнання колонки - Абонент Б (співрозмовник):
 default_config['columns_dict_sim_b'] = {
     'SIM B': 'sim_b',
     'TB': 'sim_b',
@@ -319,19 +391,23 @@ default_config['columns_dict_sim_b'] = {
     'набранный ном./звонящий': 'sim_b',
     'Тел. B': 'sim_b'}
 
+# список розпізнання колонки - Абонент, що здійснює виклик (у випадках направленої таблиці у окремих операторах):
 default_config['columns_dict_sim_c'] = {
     'Номер, который осуществляет вызов/соединение с Internet/отправляет sms': 'sim_c',
     'Номер, який здійснює виклик, з\'єднання з Internet/відправляє sms': 'sim_c'}
 
+# список розпізнання колонки - Абонент, що отримує виклик (у випадках направленої таблиці у окремих операторах):
 default_config['columns_dict_sim_d'] = {
     'Номер, который принимает вызов/sms': 'sim_d',
     'Номер, який приймає виклик/sms': 'sim_d'}
 
+# список розпізнання колонки - Час:
 default_config['columns_dict_time'] = {
     'Время': 'time',
     'час': 'time'}
 
-default_config['columns_dict_lac_cid'] = {
+# список розпізнання колонки - Тип:
+default_config['columns_dict_type'] = {
     'GGSN': 'type',
     'тип': 'type',
     'тип звонка': 'type',
@@ -339,7 +415,7 @@ default_config['columns_dict_lac_cid'] = {
     'Тип соед.': 'type',
     'Тип соединения': 'type'}
 
-with open('config.ini', 'w') as f:
+with open('config\\config.ini', 'w') as f:
     default_config.write(f)
 
 for key in default_config['azimuth_splitters']:
