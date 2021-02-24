@@ -2,7 +2,7 @@ from configparser import ConfigParser
 
 default_config = ConfigParser()
 
-default_config['import_folder_dehault'] = {'path':''}
+default_config['import_folder_default'] = {'path':''}
 
 default_config['types_con_main_display_names'] = {
     'voice_in': 'вх',
@@ -13,6 +13,54 @@ default_config['types_con_main_display_names'] = {
     'forwarding': 'переад',
     'unknown': 'переад'
     }
+
+default_config['columns_export_names'] = {
+    'type': 'Тип',
+    'date': 'Дата',
+    'time': 'Час',
+    'dur': 'Трив.',
+    'sim_a': 'Абонент А',
+    'imei_a': 'ІМЕІ А',
+    'sim_b': 'Абонент Б',
+    'imei_b': 'ІМЕІ Б',
+    'lac_a': 'LAC A',
+    'cid_a': 'Cid A',
+    'az_a': 'Аз.А',
+    'adr_a': 'Адреса А',
+    'lac_b': 'LAC Б',
+    'cid_b': 'Cid Б',
+    'az_b': 'Аз.Б',
+    'adr_b': 'Адреса Б'
+    }
+
+default_config['columns_incoming_names'] = {
+    'type': 'Тип з\'єднання',
+    'date': 'Дата',
+    'date_time': 'Час',
+    'dur': 'Тривалість',
+    'sim_a': 'Абонент А (основний абонент)',
+    'imei_a': 'ІМЕІ А',
+    'desc_a': 'Підпис власника А',
+    'sim_b': 'Абонент Б (співрозмовник)',
+    'imei_b': 'ІМЕІ Б',
+    'desc_b': 'Підпис власника Б',
+    'sim_c': 'Абонент, що здійснює виклик',
+    'sim_d': 'Абонент, що приймає виклик',
+    'lac_a': 'LAC (зона БС) абонента А',
+    'cid_a': 'Cid (номер БС) абонента А',
+    'lac_cid': 'LAC+Cid абонента А (в одній колонці)',
+    'az_a': 'Азимут БС абонента А',
+    'adr_a': 'Адреса розміщення БС - А',
+    'adr_az': 'Адреса та азимут БС в одній колонці - А',
+    'lac_b': 'LAC (зона БС) абонента Б',
+    'cid_b': 'Cid (номер БС) абонента Б',
+    'az_b': 'Азимут БС абонента Б',
+    'adr_b': 'Адреса розміщення БС - Б',
+    'imsi': 'IMSI SIM-картки',
+    'network': 'Мережа оператора',
+    'ip': 'Окрема колонка ІР-адреси',
+    'column_ignore': 'Список колонок для ігнорування програмою'
+}
 
 default_config['types_con_main_enum'] = {
     'voice_in': '1',
@@ -294,3 +342,5 @@ default_config['columns_dict_lac_cid'] = {
 with open('config.ini', 'w') as f:
     default_config.write(f)
 
+for key in default_config['azimuth_splitters']:
+    print('key is -' + key + '-end')
