@@ -1,8 +1,7 @@
 import sys
 from gui.gui import *
 from gui.gui_settings import *
-from config.config_math import config_swipe, config_load, config_save, config_add_item, config_change_item, \
-    config_remove_item
+from config.config_math import config_swipe, config_load, config_save, config_get_value, config_set_item
 
 from PyQt5.QtCore import Qt
 
@@ -94,7 +93,7 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.statusbar.showMessage('Математик: Готовий до імпорту файлів...')
+        self.ui.statusbar.showMessage('Готовий до імпорту файлів...', 5000)
         # Активність елементів в залежності від етапу виконнаня програми (підготовка до перегону/ робота з опрацьованими
         # файлами) - залежить від статусу змінної prog_execute_stage:
         if prog_execute_stage > 0:
@@ -203,6 +202,9 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         self.widget_sheets_table_view.setModel(self.sheets_view_object)
         self.ui.btn_sheet_remove.setEnabled(False)
 
+    def show_message_in_bar(self, text, timeout):
+        self.ui.statusbar.showMessage(text, timeout)
+
 
 class SettingsWindow(QtWidgets.QWidget):
     def __init__(self, parent=MainWinMatematik):
@@ -210,17 +212,27 @@ class SettingsWindow(QtWidgets.QWidget):
         self.open_modalwin_settings = Ui_Form()
         self.open_modalwin_settings.setupUi(self)
         self.setWindowModality(2)
+        self.open_modalwin_settings.label_import_dir_default.setText(config_get_value('import_folder_default', 'path'))
         self.open_modalwin_settings.btn_config_swipe.clicked.connect(config_swipe)
         self.open_modalwin_settings.btn_config_load.clicked.connect(self.choose_file_load_config)
         self.open_modalwin_settings.btn_config_save.clicked.connect(self.choose_file_save_config)
-        
+        self.open_modalwin_settings.btn_set_dir_import_default.clicked.connect(self.choose_import_dir_default)
+
     def choose_file_load_config(self):
         file = QtWidgets.QFileDialog.getOpenFileName(self, 'Завантаження налаштувань', '', 'Файл конфігурації (*.ini)')
-        config_load(file[0])
+        if file[0] != '' and file[0].lower().endswith('.ini'):
+            config_load(file[0])
 
     def choose_file_save_config(self):
         file = QtWidgets.QFileDialog.getSaveFileName(self, 'Збереження налаштувань', '', 'Файл конфігурації (*.ini)')
-        config_save(file[0])
+        if file[0] != '':
+            config_save(file[0])
+
+    def choose_import_dir_default(self):
+        new_dir = QtWidgets.QFileDialog.getExistingDirectory(self, 'Обрати папку для швидкого завантаження файлів')
+        config_set_item('import_folder_default', 'path', new_dir)
+        self.open_modalwin_settings.label_import_dir_default.setText(config_get_value('import_folder_default', 'path'))
+
 
 # -----------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------ВИКОНАННЯ ПРОГРАМИ------------------------------------------------

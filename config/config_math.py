@@ -19,14 +19,19 @@ def config_save(file):
 
 
 def config_load(file):
+    current_config.clear()
     current_config.read(file)
     with open('config\\config.ini', 'w') as z:
         current_config.write(z)
     print('settings loaded from file:' + str(file))
 
 
-def config_add_item():
-    pass
+def config_get_value(section, option):
+    return current_config.get(section, option)
+
+
+def config_set_item(section, option, value):
+    current_config.set(section, option, value)
 
 
 def config_remove_item():
