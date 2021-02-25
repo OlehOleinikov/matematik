@@ -650,10 +650,16 @@ def analysis_type_a(call_data_df, subscriber):
     def get_frequent_azimuth(bs_name):
         df_azimuth_get = df.loc[df['adr_a'] == bs_name].copy()
         azimuth_rating = df_azimuth_get.groupby(['az_a'])['weigth_column'].sum()
+        print('Групованй список азимутів ' + str(azimuth_rating) + ' для БС - ' + str(bs_name))
         azimuth_rating.drop(labels=['', '0'], inplace=True, errors='ignore')
+        print('Групованй список азимутів після дропу 0 та порож.' + str(azimuth_rating) + ' для БС - ' + str(bs_name))
+        azimuth_rating.sort_values(inplace=True, ascending=False)
+        print("список після сортування " + str(azimuth_rating))
         if azimuth_rating.size > 0:
             list_az_names = azimuth_rating.index.values.tolist()
+            print('список азимутів (ліст) ' + str(list_az_names))
             azimuth = list_az_names[0]
+            print('нульовий елемент =' + str(azimuth))
         else:
             azimuth = 'у первинній таблиці відсутні'
         return azimuth
@@ -663,9 +669,8 @@ def analysis_type_a(call_data_df, subscriber):
         azimuth_fr_list.append(get_frequent_azimuth(bs))
 
     for num in range(len(bs_top_list)):
-        document.add_paragraph(str(bs_top_values[num]) + " - разів зафіксовано: найменування адреси розташування "
-                                                         "базової станції: " + str(bs_top_list[num]) +
-                               " (азимут найчастіше - " + str(azimuth_fr_list[num]) + ").",
+        document.add_paragraph(str(bs_top_values[num]) + " - разів зафіксовано  в зоні дії БС: \"" + str(bs_top_list[num])
+                               + "\" (азимут найчастіше - " + str(azimuth_fr_list[num]) + ").",
                                style=list_style)
 
     def build_plots_for_bs(index_bs):
