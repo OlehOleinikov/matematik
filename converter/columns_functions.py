@@ -70,19 +70,29 @@ def check_dur(cell):
 
 
 # check LAC and CID cells:
-def check_laccid(s):
-    s = str(s)
-    if s.endswith('.0'):
-        s = s[:-2]
-    if s.isdigit():
-        a = int(s)
-    elif s == 'nan' or s is None:
-        a = ''
+def check_laccid(input_value):
+
+    # print('type of input LAC or Cid' + str(type(input_value)))
+    # print('input value is:')
+    # print(input_value)
+
+    if input_value is not None:
+        input_value = str(input_value)
+
+    if input_value is None or input_value == 'nan':
+        converted_value = ''
+        # print('input value is None, write an empty str value')
+    elif input_value.isdigit():
+        converted_value = input_value
+        # print('input value LACCid is digital, converted to int...')
+    elif input_value.endswith('.0'):
+        converted_value = input_value[:-2]
+        # print('input value has a float-tail, cutting point zero')
     else:
-        print(Fore.RED + "\t\tОшибка формата LAC/Cid: ", s, " Записываю пустое значение...")
-        print(Style.RESET_ALL)
-        a = ''
-    return a
+        print(Fore.RED + "\t\tНеочікуване значення LAC/Cid: ", input_value, " Записано порожнє..." + Style.RESET_ALL)
+        converted_value = ''
+    # print('result value is ' + str(converted_value) + ' and type is ' + str(type(converted_value)))
+    return converted_value
 
 
 # concat LAC and CID value with separator '-':
