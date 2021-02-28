@@ -4,7 +4,7 @@ from gui.gui_settings import Ui_Form
 from gui.gui_import_folder import *
 
 
-from config.config_math import config_get_value, config_set_item, config_save, config_load, config_swipe
+from config.config_math import config_get_value, config_set_item, config_save, config_load, config_swipe, config_get_options
 
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QThread
 from PyQt5.Qt import QProxyStyle, QStyle
@@ -62,8 +62,9 @@ print_logo()
 # ---------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------ХЕНДЛЕР ПОДІЙ---------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------
-class HandlerMain(QObject):
-    signal_update_statusbar = pyqtSignal()
+class HandlerFirst(QObject):
+    signal_update_statusbar = pyqtSignal(str)
+    signal_settings_changed = pyqtSignal()
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -113,6 +114,8 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.statusbar.showMessage('Програму завантажено', 5000)
+
+        self.win_settings = SettingsWindow()
         #
 
         # ---------------------------------Початкова активність елементів(віджетів):-----------------------------------
@@ -150,24 +153,28 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         # Видалити виділений файл з таблиці (також видаляється з availible_sheets_list)
         self.ui.btn_sheet_remove.clicked.connect(self.remove_sheet_from_list)
         # Відкрити вікно налаштувань
+        self.ui.btn_settings_win.clicked.connect(self.win_settings.update_settings_gui)
         self.ui.btn_settings_win.clicked.connect(self.open_modalwin_settings)
         # Завантажити список з типової папки імпорту
         self.ui.btn_sheet_import_def_dir.clicked.connect(self.add_sheet_folder_default)
+        # Сигнал оновлення статусбару:
+        self.win_settings.signal.signal_update_statusbar.connect(self.print_statusbar)
         #
 
     # -----------------------------------------методи ВІДКРИТТЯ ВІКОН --------------------------------------------------
     def open_modalwin_settings(self):
-        window = SettingsWindow(self)
         flags = Qt.WindowFlags(Qt.FramelessWindowHint | Qt.Window)
-        window.setWindowFlags(flags)
-        window.show()
+        self.win_settings.setWindowFlags(flags)
+        self.win_settings.show()
 
     def open_modalwin_import_folder(self):
         mw = ChooseImportFolder(self)
         flags = Qt.WindowFlags(Qt.FramelessWindowHint | Qt.Window)
         mw.setWindowFlags(flags)
         mw.show()
-        #
+
+    def print_statusbar(self, text):
+        self.ui.statusbar.showMessage(str(text), 5000)
 
     # --------------------------------------методи КНОПОК конвертеру --------------------------------------------------
     def remove_btn_update(self):  # активність кнопки видалення залежно від наявності виділеного рядку
@@ -259,13 +266,15 @@ class MainWinMatematik(QtWidgets.QMainWindow):
 # -----------------------------------------ВІКНО НАЛАШТУВАНЬ SETTINGS--------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------
 class SettingsWindow(QtWidgets.QWidget):
-    def __init__(self, parent=MainWinMatematik):
-        super().__init__(parent, QtCore.Qt.Window)
+    def __init__(self, parent=MainWinMatematik):  # втрачається центрування до батьківського вікна
+        QtWidgets.QWidget.__init__(self)
+        # super().__init__()
         self.open_modalwin_settings = Ui_Form()
         self.open_modalwin_settings.setupUi(self)
         self.setWindowModality(2)
+        self.signal = HandlerFirst()
         self.open_modalwin_settings.label_import_dir_default.setText(config_get_value('import_folder_default', 'path'))
-        self.open_modalwin_settings.btn_config_swipe.clicked.connect(config_swipe)
+        self.open_modalwin_settings.btn_config_swipe.clicked.connect(self.swipe_to_factory)
         self.open_modalwin_settings.btn_config_load.clicked.connect(self.choose_file_load_config)
         self.open_modalwin_settings.btn_config_save.clicked.connect(self.choose_file_save_config)
         self.open_modalwin_settings.btn_set_dir_import_default.clicked.connect(self.choose_import_dir_default)
@@ -273,36 +282,147 @@ class SettingsWindow(QtWidgets.QWidget):
         self.open_modalwin_settings.btn_setup_ok.clicked.connect(self.settings_win_close_save_settings)
         self.open_modalwin_settings.btn_setup_accept.setEnabled(True)
         self.open_modalwin_settings.btn_setup_accept.clicked.connect(self.accept_changes_settings)
+        self.signal.signal_settings_changed.connect(self.update_settings_gui)
+
+        self.open_modalwin_settings.lineEdit_exportname_voice_in.textChanged.connect(
+            lambda x: config_set_item('types_con_main_display_names', 'voice_in', str(x)))
+        self.open_modalwin_settings.lineEdit_exportname_voice_out.textChanged.connect(
+            lambda x: config_set_item('types_con_main_display_names', 'voice_out', str(x)))
+        self.open_modalwin_settings.lineEdit_exportname_message_in.textChanged.connect(
+            lambda x: config_set_item('types_con_main_display_names', 'message_in', str(x)))
+        self.open_modalwin_settings.lineEdit_exportname_message_out.textChanged.connect(
+            lambda x: config_set_item('types_con_main_display_names', 'message_out', str(x)))
+        self.open_modalwin_settings.lineEdit_exportname_network.textChanged.connect(
+            lambda x: config_set_item('types_con_main_display_names', 'network', str(x)))
+        self.open_modalwin_settings.lineEdit_exportname_forwarding.textChanged.connect(
+            lambda x: config_set_item('types_con_main_display_names', 'forwarding', str(x)))
+        self.open_modalwin_settings.lineEdit_exportname_unknowntypes.textChanged.connect(
+            lambda x: config_set_item('types_con_main_display_names', 'unknown', str(x)))
+
+        model_voice_in = QtGui.QStandardItemModel()
+        self.open_modalwin_settings.listView_voice_in.setModel(model_voice_in)
+        voice_in_types = config_get_options('types_dict_voice_in')
+        for i in voice_in_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                model_voice_in.appendRow(item)
+
+        model_voice_out = QtGui.QStandardItemModel()
+        self.open_modalwin_settings.listView_voice_out.setModel(model_voice_out)
+        voice_out_types = config_get_options('types_dict_voice_out')
+        for i in voice_out_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                model_voice_out.appendRow(item)
+
+        model_message_out = QtGui.QStandardItemModel()
+        self.open_modalwin_settings.listView_message_out.setModel(model_message_out)
+        message_out_types = config_get_options('types_dict_message_out')
+        for i in message_out_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                model_message_out.appendRow(item)
+
+        model_message_in = QtGui.QStandardItemModel()
+        self.open_modalwin_settings.listView_message_in.setModel(model_message_in)
+        message_in_types = config_get_options('types_dict_message_in')
+        for i in message_in_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                model_message_in.appendRow(item)
+
+        model_network = QtGui.QStandardItemModel()
+        self.open_modalwin_settings.listView_network.setModel(model_network)
+        network_types = config_get_options('types_dict_network')
+        for i in network_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                model_network.appendRow(item)
+
+        model_forwarding = QtGui.QStandardItemModel()
+        self.open_modalwin_settings.listView_forwarding.setModel(model_forwarding)
+        forwarding_types = config_get_options('types_dict_forwarding')
+        for i in forwarding_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                model_forwarding.appendRow(item)
+
+    # def set_type_export_voice_in(self, text):
+       #  config_set_item('types_con_main_display_names', 'voice_in', str(text))
+
+    def swipe_to_factory(self):
+        config_swipe()
+        self.signal.signal_settings_changed.emit()
+        text = 'Налаштування програми СКИНУТО ДО ПОЧАТКОВИХ'
+        self.signal.signal_update_statusbar.emit(text)
 
     def choose_file_load_config(self):
         file = QtWidgets.QFileDialog.getOpenFileName(self, 'Завантаження налаштувань', '', 'Файл конфігурації (*.ini)')
         if file[0] != '' and file[0].lower().endswith('.ini'):
             config_load(file[0])
+            text = 'Налаштування програми завантажено з файлу: ' + str(file[0])
+            self.signal.signal_update_statusbar.emit(text)
+            self.signal.signal_settings_changed.emit()
 
     def choose_file_save_config(self):
         file = QtWidgets.QFileDialog.getSaveFileName(self, 'Збереження налаштувань', '', 'Файл конфігурації (*.ini)')
         if file[0] != '':
             config_save(file[0])
+            text = 'Налаштування програми збережено у файл: ' + str(file[0])
+            self.signal.signal_update_statusbar.emit(text)
 
     def choose_import_dir_default(self):
         new_dir = QtWidgets.QFileDialog.getExistingDirectory(self, 'Обрати папку для швидкого завантаження файлів')
         if new_dir != '':
             config_set_item('import_folder_default', 'path', new_dir)
-        self.open_modalwin_settings.label_import_dir_default.setText(config_get_value('import_folder_default', 'path'))
+            text = 'Визначено типову для імпорту папку: ' + str(new_dir)
+            self.signal.signal_update_statusbar.emit(text)
+            self.signal.signal_settings_changed.emit()
+
 
     def settings_win_close_without_save(self):
         config_load('config\\config.ini')
         print('Settings closed without save')
+        text = 'Налаштування завершені без збереження'
+        self.signal.signal_update_statusbar.emit(text)
+        self.signal.signal_settings_changed.emit()
         self.close()
 
     def settings_win_close_save_settings(self):
         config_save('config\\config.ini')
         print('Settings closed and changes saved')
+        text = 'Налаштування завершені та збережені'
+        self.signal.signal_update_statusbar.emit(text)
         self.close()
 
     def accept_changes_settings(self):
         config_save('config\\config.ini')
+        text = 'Виконані зміни у налаштуваннях зафіксовано'
+        self.signal.signal_update_statusbar.emit(text)
         print('Changes accepted and save to config')
+
+    def update_settings_gui(self):
+        self.open_modalwin_settings.label_import_dir_default.setText(
+            config_get_value('import_folder_default', 'path'))  # оновлення типової папки імпорту
+
+        # Оновлення рядків зі списоком типів (як будуть відображатися в готовій таблиці):
+        self.open_modalwin_settings.lineEdit_exportname_voice_in.setText(
+            config_get_value('types_con_main_display_names', 'voice_in'))
+        self.open_modalwin_settings.lineEdit_exportname_voice_out.setText(
+            config_get_value('types_con_main_display_names', 'voice_out'))
+        self.open_modalwin_settings.lineEdit_exportname_message_in.setText(
+            config_get_value('types_con_main_display_names', 'message_in'))
+        self.open_modalwin_settings.lineEdit_exportname_message_out.setText(
+            config_get_value('types_con_main_display_names', 'message_out'))
+        self.open_modalwin_settings.lineEdit_exportname_network.setText(
+            config_get_value('types_con_main_display_names', 'network'))
+        self.open_modalwin_settings.lineEdit_exportname_forwarding.setText(
+            config_get_value('types_con_main_display_names', 'forwarding'))
+        self.open_modalwin_settings.lineEdit_exportname_unknowntypes.setText(
+            config_get_value('types_con_main_display_names', 'unknown'))
+
+        # Оновлення списків типів для розпізнання:
+
         #
 
 
@@ -322,6 +442,7 @@ class ChooseImportFolder(QtWidgets.QWidget):
         new_dir = QtWidgets.QFileDialog.getExistingDirectory(self, 'Обрати папку для швидкого завантаження файлів')
         if new_dir != '':
             config_set_item('import_folder_default', 'path', new_dir)
+            config_save('config\\config.ini')
         self.close()
         #
 
