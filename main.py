@@ -284,6 +284,7 @@ class SettingsWindow(QtWidgets.QWidget):
         self.open_modalwin_settings.btn_setup_accept.clicked.connect(self.accept_changes_settings)
         self.signal.signal_settings_changed.connect(self.update_settings_gui)
 
+        #---------------------Завантаження даних про вихідні типи (підпис у результуючій таблиці)-----------------------
         self.open_modalwin_settings.lineEdit_exportname_voice_in.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'voice_in', str(x)))
         self.open_modalwin_settings.lineEdit_exportname_voice_out.textChanged.connect(
@@ -299,6 +300,7 @@ class SettingsWindow(QtWidgets.QWidget):
         self.open_modalwin_settings.lineEdit_exportname_unknowntypes.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'unknown', str(x)))
 
+        # -------------------------Завантаження типів для розпізнання у вхідних таблицях--------------------------------
         model_voice_in = QtGui.QStandardItemModel()
         self.open_modalwin_settings.listView_voice_in.setModel(model_voice_in)
         voice_in_types = config_get_options('types_dict_voice_in')
@@ -346,9 +348,6 @@ class SettingsWindow(QtWidgets.QWidget):
             if i != '':
                 item = QtGui.QStandardItem(i)
                 model_forwarding.appendRow(item)
-
-    # def set_type_export_voice_in(self, text):
-       #  config_set_item('types_con_main_display_names', 'voice_in', str(text))
 
     def swipe_to_factory(self):
         config_swipe()
@@ -401,6 +400,7 @@ class SettingsWindow(QtWidgets.QWidget):
         self.signal.signal_update_statusbar.emit(text)
         print('Changes accepted and save to config')
 
+    # ---------------------------МЕТОД оновлення значень вікна налаштувань при їх зміні--------------------------------
     def update_settings_gui(self):
         self.open_modalwin_settings.label_import_dir_default.setText(
             config_get_value('import_folder_default', 'path'))  # оновлення типової папки імпорту
