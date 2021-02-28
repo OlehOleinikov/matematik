@@ -45,7 +45,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_setup_common">
       <attribute name="title">
@@ -302,7 +302,7 @@
                 <item>
                  <widget class="QLabel" name="label_25">
                   <property name="text">
-                   <string>Конвертувати в:</string>
+                   <string>Відображати як:  </string>
                   </property>
                  </widget>
                 </item>
@@ -394,7 +394,7 @@
                 <item>
                  <widget class="QLabel" name="label_24">
                   <property name="text">
-                   <string>Конвертувати в:</string>
+                   <string>Відображати як:  </string>
                   </property>
                  </widget>
                 </item>
@@ -467,8 +467,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>385</width>
-            <height>271</height>
+            <width>423</width>
+            <height>307</height>
            </rect>
           </property>
           <attribute name="label">
@@ -501,7 +501,7 @@
                 <item>
                  <widget class="QLabel" name="label_27">
                   <property name="text">
-                   <string>Конвертувати в:</string>
+                   <string>Відображати як:  </string>
                   </property>
                  </widget>
                 </item>
@@ -593,7 +593,7 @@
                 <item>
                  <widget class="QLabel" name="label_26">
                   <property name="text">
-                   <string>Конвертувати в:</string>
+                   <string>Відображати як:  </string>
                   </property>
                  </widget>
                 </item>
@@ -666,8 +666,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>407</width>
-            <height>293</height>
+            <width>423</width>
+            <height>307</height>
            </rect>
           </property>
           <attribute name="label">
@@ -700,7 +700,7 @@
                 <item>
                  <widget class="QLabel" name="label_28">
                   <property name="text">
-                   <string>Конвертувати в:</string>
+                   <string>Відображати як:  </string>
                   </property>
                  </widget>
                 </item>
@@ -792,7 +792,7 @@
                 <item>
                  <widget class="QLabel" name="label_29">
                   <property name="text">
-                   <string>Конвертувати в:</string>
+                   <string>Відображати як:  </string>
                   </property>
                  </widget>
                 </item>
@@ -863,6 +863,19 @@
         </widget>
        </item>
        <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_40">
          <property name="spacing">
           <number>3</number>
@@ -914,19 +927,6 @@
          </item>
         </layout>
        </item>
-       <item>
-        <spacer name="verticalSpacer_7">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_setup_columns">
@@ -937,15 +937,15 @@
        <item>
         <widget class="QToolBox" name="toolBox_2">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page_4">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>385</width>
-            <height>293</height>
+            <width>423</width>
+            <height>426</height>
            </rect>
           </property>
           <attribute name="label">
