@@ -35,8 +35,8 @@ def config_set_item(section, option, value):
     current_config.set(section, option, value)
 
 
-def config_remove_item():
-    pass
+def config_remove_item(section, option):
+    current_config.remove_option(section, option)
 
 
 current_config = ConfigParser()  # об'єкт конфігурації, яка використовується під час роботи

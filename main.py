@@ -4,7 +4,8 @@ from gui.gui_settings import Ui_Form
 from gui.gui_import_folder import *
 
 
-from config.config_math import config_get_value, config_set_item, config_save, config_load, config_swipe, config_get_options
+from config.config_math import config_get_value, config_set_item, config_save, config_load, config_swipe, \
+    config_get_options, config_remove_item
 
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QThread
 from PyQt5.Qt import QProxyStyle, QStyle
@@ -284,9 +285,17 @@ class SettingsWindow(QtWidgets.QWidget):
         self.open_modalwin_settings.btn_setup_accept.clicked.connect(self.accept_changes_settings)
         self.signal.signal_settings_changed.connect(self.update_settings_gui)
 
+        self.open_modalwin_settings.btn_add_voice_in.setEnabled(False)
+        self.open_modalwin_settings.btn_remove_voice_in.setEnabled(False)
+        self.open_modalwin_settings.btn_remove_voice_in.clicked.connect(self.remove_voice_in_item)
+        self.open_modalwin_settings.listView_voice_in.clicked.connect(self.upd_btn_remove_voice_in)
+
+        self.open_modalwin_settings.lineEdit_add_voice_in.textChanged.connect(self.upd_btn_add_voice_in)
         #---------------------Завантаження даних про вихідні типи (підпис у результуючій таблиці)-----------------------
         self.open_modalwin_settings.lineEdit_exportname_voice_in.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'voice_in', str(x)))
+
+
         self.open_modalwin_settings.lineEdit_exportname_voice_out.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'voice_out', str(x)))
         self.open_modalwin_settings.lineEdit_exportname_message_in.textChanged.connect(
@@ -301,13 +310,16 @@ class SettingsWindow(QtWidgets.QWidget):
             lambda x: config_set_item('types_con_main_display_names', 'unknown', str(x)))
 
         # -------------------------Завантаження типів для розпізнання у вхідних таблицях--------------------------------
-        model_voice_in = QtGui.QStandardItemModel()
-        self.open_modalwin_settings.listView_voice_in.setModel(model_voice_in)
+        self.model_voice_in = QtGui.QStandardItemModel()
+        self.open_modalwin_settings.listView_voice_in.setModel(self.model_voice_in)
         voice_in_types = config_get_options('types_dict_voice_in')
         for i in voice_in_types:
             if i != '':
                 item = QtGui.QStandardItem(i)
-                model_voice_in.appendRow(item)
+                self.model_voice_in.appendRow(item)
+        self.sel_model_voice_in = self.open_modalwin_settings.listView_voice_in.selectionModel()
+        self.sel_model_voice_in.selectionChanged.connect(self.upd_btn_remove_voice_in)
+
 
         model_voice_out = QtGui.QStandardItemModel()
         self.open_modalwin_settings.listView_voice_out.setModel(model_voice_out)
@@ -348,6 +360,41 @@ class SettingsWindow(QtWidgets.QWidget):
             if i != '':
                 item = QtGui.QStandardItem(i)
                 model_forwarding.appendRow(item)
+
+    def upd_btn_remove_voice_in(self):
+        if self.sel_model_voice_in.hasSelection():
+            self.open_modalwin_settings.btn_remove_voice_in.setEnabled(True)
+        else:
+            self.open_modalwin_settings.btn_remove_voice_in.setEnabled(False)
+
+    def upd_btn_add_voice_in(self):
+        if self.open_modalwin_settings.lineEdit_add_voice_in.text() != '':
+            self.open_modalwin_settings.btn_add_voice_in.setEnabled(True)
+        else:
+            self.open_modalwin_settings.btn_add_voice_in.setEnabled(False)
+
+    def upd_list_voice_in(self):
+        model_voice_in = QtGui.QStandardItemModel()
+        self.open_modalwin_settings.listView_voice_in.setModel(model_voice_in)
+        voice_in_types = config_get_options('types_dict_voice_in')
+        for i in voice_in_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                model_voice_in.appendRow(item)
+
+    def remove_voice_in_item(self):
+        if self.sel_model_voice_in.hasSelection():
+            index = self.sel_model_voice_in.currentIndex()
+            text = index.data()
+            row = index.row()
+            print(row)
+            config_remove_item('types_dict_voice_in', str(text))
+            self.model_voice_in.removeRow(row)
+
+            self.upd_list_voice_in()
+            # self.open_modalwin_settings.btn_remove_voice_in.setEnabled(False)
+        else:
+            pass
 
     def swipe_to_factory(self):
         config_swipe()
