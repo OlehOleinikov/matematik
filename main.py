@@ -7,7 +7,7 @@ from gui.gui_import_folder import *
 from config.config_math import config_get_value, config_set_item, config_save, config_load, config_swipe, \
     config_get_options, config_remove_item
 
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QThread
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QThread, QEvent
 from PyQt5.Qt import QProxyStyle, QStyle
 from PyQt5.QtWidgets import QStyleFactory
 
@@ -288,6 +288,7 @@ class SettingsWindow(QtWidgets.QWidget):
         self.open_modalwin_settings.btn_add_voice_in.setEnabled(False)
         self.open_modalwin_settings.btn_remove_voice_in.setEnabled(False)
         self.open_modalwin_settings.btn_remove_voice_in.clicked.connect(self.remove_voice_in_item)
+        self.open_modalwin_settings.btn_add_voice_in.clicked.connect(self.add_item_voice_in)
         self.open_modalwin_settings.listView_voice_in.clicked.connect(self.upd_btn_remove_voice_in)
 
         self.open_modalwin_settings.lineEdit_add_voice_in.textChanged.connect(self.upd_btn_add_voice_in)
@@ -374,13 +375,12 @@ class SettingsWindow(QtWidgets.QWidget):
             self.open_modalwin_settings.btn_add_voice_in.setEnabled(False)
 
     def upd_list_voice_in(self):
-        model_voice_in = QtGui.QStandardItemModel()
-        self.open_modalwin_settings.listView_voice_in.setModel(model_voice_in)
+        self.model_voice_in.clear()
         voice_in_types = config_get_options('types_dict_voice_in')
         for i in voice_in_types:
             if i != '':
                 item = QtGui.QStandardItem(i)
-                model_voice_in.appendRow(item)
+                self.model_voice_in.appendRow(item)
 
     def remove_voice_in_item(self):
         if self.sel_model_voice_in.hasSelection():
@@ -390,11 +390,14 @@ class SettingsWindow(QtWidgets.QWidget):
             print(row)
             config_remove_item('types_dict_voice_in', str(text))
             self.model_voice_in.removeRow(row)
+            self.sel_model_voice_in.clearSelection()
 
+    def add_item_voice_in(self):
+        if self.open_modalwin_settings.lineEdit_add_voice_in.text() != '':
+            config_set_item('types_dict_voice_in', str(self.open_modalwin_settings.lineEdit_add_voice_in.text()), str('True'))
+            self.open_modalwin_settings.lineEdit_add_voice_in.clear()
             self.upd_list_voice_in()
-            # self.open_modalwin_settings.btn_remove_voice_in.setEnabled(False)
-        else:
-            pass
+
 
     def swipe_to_factory(self):
         config_swipe()
@@ -469,7 +472,7 @@ class SettingsWindow(QtWidgets.QWidget):
             config_get_value('types_con_main_display_names', 'unknown'))
 
         # Оновлення списків типів для розпізнання:
-
+        self.upd_list_voice_in()
         #
 
 
