@@ -270,109 +270,167 @@ class SettingsWindow(QtWidgets.QWidget):
     def __init__(self, parent=MainWinMatematik):  # втрачається центрування до батьківського вікна
         QtWidgets.QWidget.__init__(self)
         # super().__init__()
-        self.open_modalwin_settings = Ui_Form()
-        self.open_modalwin_settings.setupUi(self)
+        self.win_settings = Ui_Form()
+        self.win_settings.setupUi(self)
         self.setWindowModality(2)
         self.signal = HandlerFirst()
-        self.open_modalwin_settings.label_import_dir_default.setText(config_get_value('import_folder_default', 'path'))
-        self.open_modalwin_settings.btn_config_swipe.clicked.connect(self.swipe_to_factory)
-        self.open_modalwin_settings.btn_config_load.clicked.connect(self.choose_file_load_config)
-        self.open_modalwin_settings.btn_config_save.clicked.connect(self.choose_file_save_config)
-        self.open_modalwin_settings.btn_set_dir_import_default.clicked.connect(self.choose_import_dir_default)
-        self.open_modalwin_settings.btn_setup_cancel.clicked.connect(self.settings_win_close_without_save)
-        self.open_modalwin_settings.btn_setup_ok.clicked.connect(self.settings_win_close_save_settings)
-        self.open_modalwin_settings.btn_setup_accept.setEnabled(True)
-        self.open_modalwin_settings.btn_setup_accept.clicked.connect(self.accept_changes_settings)
-        self.signal.signal_settings_changed.connect(self.update_settings_gui)
 
-        self.open_modalwin_settings.btn_add_voice_in.setEnabled(False)
-        self.open_modalwin_settings.btn_remove_voice_in.setEnabled(False)
-        self.open_modalwin_settings.btn_remove_voice_in.clicked.connect(self.remove_voice_in_item)
-        self.open_modalwin_settings.btn_add_voice_in.clicked.connect(self.add_item_voice_in)
-        self.open_modalwin_settings.listView_voice_in.clicked.connect(self.upd_btn_remove_voice_in)
+        # Функції кнопок першої вкладки налаштувань та основних кнопок: ------------------------------------------------
+        self.win_settings.label_import_dir_default.setText(config_get_value('import_folder_default', 'path'))
+        self.win_settings.btn_config_swipe.clicked.connect(self.swipe_to_factory)
+        self.win_settings.btn_config_load.clicked.connect(self.choose_file_load_config)
+        self.win_settings.btn_config_save.clicked.connect(self.choose_file_save_config)
+        self.win_settings.btn_set_dir_import_default.clicked.connect(self.choose_import_dir_default)
+        self.win_settings.btn_setup_cancel.clicked.connect(self.settings_win_close_without_save)
+        self.win_settings.btn_setup_ok.clicked.connect(self.settings_win_close_save_settings)
+        self.win_settings.btn_setup_accept.setEnabled(True)
+        self.win_settings.btn_setup_accept.clicked.connect(self.accept_changes_settings)
+        self.signal.signal_settings_changed.connect(self.update_settings_gui)  # сигнал оновлення всього вікна
+                                                                               # налаштувань з config.ini
 
-        self.open_modalwin_settings.lineEdit_add_voice_in.textChanged.connect(self.upd_btn_add_voice_in)
-        #---------------------Завантаження даних про вихідні типи (підпис у результуючій таблиці)-----------------------
-        self.open_modalwin_settings.lineEdit_exportname_voice_in.textChanged.connect(
+        # Підключення функції кнопок ТИПІВ РОЗПІЗНАННЯ:-----------------------------------------------------------------
+        # Функції кнопок - редагування списку ВХІДНИХ ДЗВІНКІВ
+        self.win_settings.btn_add_voice_in.setEnabled(False)
+        self.win_settings.btn_remove_voice_in.setEnabled(False)
+        self.win_settings.btn_remove_voice_in.clicked.connect(self.remove_voice_in_item)
+        self.win_settings.btn_add_voice_in.clicked.connect(self.add_item_voice_in)
+        self.win_settings.listView_voice_in.clicked.connect(self.upd_btn_remove_voice_in)
+        # Функції кнопок - редагування списку ВИХІДНИХ ДЗВІНКІВ
+        self.win_settings.btn_add_voice_out.setEnabled(False)
+        self.win_settings.btn_remove_voice_out.setEnabled(False)
+        self.win_settings.btn_remove_voice_out.clicked.connect(self.remove_voice_out_item)
+        self.win_settings.btn_add_voice_out.clicked.connect(self.add_item_voice_out)
+        self.win_settings.listView_voice_out.clicked.connect(self.upd_btn_remove_voice_out)
+        # Функції кнопок - редагування списку ВХІДНИХ ПОВІДОМЛЕНЬ
+        self.win_settings.btn_add_message_in.setEnabled(False)
+        self.win_settings.btn_remove_message_in.setEnabled(False)
+        self.win_settings.btn_remove_message_in.clicked.connect(self.remove_message_in_item)
+        self.win_settings.btn_add_message_in.clicked.connect(self.add_item_message_in)
+        self.win_settings.listView_message_in.clicked.connect(self.upd_btn_remove_message_in)
+        # Функції кнопок - редагування списку ВИХІДНИХ ПОВІДОМЛЕНЬ
+        self.win_settings.btn_add_message_out.setEnabled(False)
+        self.win_settings.btn_remove_message_out.setEnabled(False)
+        self.win_settings.btn_remove_message_out.clicked.connect(self.remove_message_out_item)
+        self.win_settings.btn_add_message_out.clicked.connect(self.add_item_message_out)
+        self.win_settings.listView_message_out.clicked.connect(self.upd_btn_remove_message_out)
+        # Функції кнопок - редагування списку ІНТЕРНЕТ
+        self.win_settings.btn_add_network.setEnabled(False)
+        self.win_settings.btn_remove_network.setEnabled(False)
+        self.win_settings.btn_remove_network.clicked.connect(self.remove_network_item)
+        self.win_settings.btn_add_network.clicked.connect(self.add_item_network)
+        self.win_settings.listView_network.clicked.connect(self.upd_btn_remove_network)
+        # Функції кнопок - редагування списку ПЕРЕАДРЕСАЦІЇ
+        self.win_settings.btn_add_forwarding.setEnabled(False)
+        self.win_settings.btn_remove_forwarding.setEnabled(False)
+        self.win_settings.btn_remove_forwarding.clicked.connect(self.remove_forwarding_item)
+        self.win_settings.btn_add_forwarding.clicked.connect(self.add_item_forwarding)
+        self.win_settings.listView_forwarding.clicked.connect(self.upd_btn_remove_forwarding)
+
+        # Встановлення АКТИВНОСТІ КНОПКИ ДОДАВАННЯ типів з'єднань для розпізнання
+        self.win_settings.lineEdit_add_voice_in.textChanged.connect(self.upd_btn_add_voice_in)
+        self.win_settings.lineEdit_add_voice_out.textChanged.connect(self.upd_btn_add_voice_out)
+        self.win_settings.lineEdit_add_message_in.textChanged.connect(self.upd_btn_add_message_in)
+        self.win_settings.lineEdit_add_message_out.textChanged.connect(self.upd_btn_add_message_out)
+        self.win_settings.lineEdit_add_network.textChanged.connect(self.upd_btn_add_network)
+        self.win_settings.lineEdit_add_forwarding.textChanged.connect(self.upd_btn_add_forwarding)
+
+        # Завантаження НАЙМЕНУВАНЬ ТИПІВ для відображення у ЕКСПОРТОВАНИХ ТАБЛИЦЯХ:-------------------------------------
+        self.win_settings.lineEdit_exportname_voice_in.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'voice_in', str(x)))
-
-
-        self.open_modalwin_settings.lineEdit_exportname_voice_out.textChanged.connect(
+        self.win_settings.lineEdit_exportname_voice_out.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'voice_out', str(x)))
-        self.open_modalwin_settings.lineEdit_exportname_message_in.textChanged.connect(
+        self.win_settings.lineEdit_exportname_message_in.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'message_in', str(x)))
-        self.open_modalwin_settings.lineEdit_exportname_message_out.textChanged.connect(
+        self.win_settings.lineEdit_exportname_message_out.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'message_out', str(x)))
-        self.open_modalwin_settings.lineEdit_exportname_network.textChanged.connect(
+        self.win_settings.lineEdit_exportname_network.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'network', str(x)))
-        self.open_modalwin_settings.lineEdit_exportname_forwarding.textChanged.connect(
+        self.win_settings.lineEdit_exportname_forwarding.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'forwarding', str(x)))
-        self.open_modalwin_settings.lineEdit_exportname_unknowntypes.textChanged.connect(
+        self.win_settings.lineEdit_exportname_unknowntypes.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'unknown', str(x)))
 
-        # -------------------------Завантаження типів для розпізнання у вхідних таблицях--------------------------------
+        # ЗАПОВНЕННЯ ListView ТИПІВ РОЗПІЗНАННЯ:------------------------------------------------------------------------
         self.model_voice_in = QtGui.QStandardItemModel()
-        self.open_modalwin_settings.listView_voice_in.setModel(self.model_voice_in)
+        self.win_settings.listView_voice_in.setModel(self.model_voice_in)
         voice_in_types = config_get_options('types_dict_voice_in')
         for i in voice_in_types:
             if i != '':
                 item = QtGui.QStandardItem(i)
                 self.model_voice_in.appendRow(item)
-        self.sel_model_voice_in = self.open_modalwin_settings.listView_voice_in.selectionModel()
+        self.sel_model_voice_in = self.win_settings.listView_voice_in.selectionModel()
         self.sel_model_voice_in.selectionChanged.connect(self.upd_btn_remove_voice_in)
 
-
-        model_voice_out = QtGui.QStandardItemModel()
-        self.open_modalwin_settings.listView_voice_out.setModel(model_voice_out)
+        self.model_voice_out = QtGui.QStandardItemModel()
+        self.win_settings.listView_voice_out.setModel(self.model_voice_out)
         voice_out_types = config_get_options('types_dict_voice_out')
         for i in voice_out_types:
             if i != '':
                 item = QtGui.QStandardItem(i)
-                model_voice_out.appendRow(item)
+                self.model_voice_out.appendRow(item)
+        self.sel_model_voice_out = self.win_settings.listView_voice_out.selectionModel()
+        self.sel_model_voice_out.selectionChanged.connect(self.upd_btn_remove_voice_out)
 
-        model_message_out = QtGui.QStandardItemModel()
-        self.open_modalwin_settings.listView_message_out.setModel(model_message_out)
+        self.model_message_out = QtGui.QStandardItemModel()
+        self.win_settings.listView_message_out.setModel(self.model_message_out)
         message_out_types = config_get_options('types_dict_message_out')
         for i in message_out_types:
             if i != '':
                 item = QtGui.QStandardItem(i)
-                model_message_out.appendRow(item)
+                self.model_message_out.appendRow(item)
+        self.sel_model_message_out = self.win_settings.listView_message_out.selectionModel()
+        self.sel_model_message_out.selectionChanged.connect(self.upd_btn_remove_message_out)
 
-        model_message_in = QtGui.QStandardItemModel()
-        self.open_modalwin_settings.listView_message_in.setModel(model_message_in)
+        self.model_message_in = QtGui.QStandardItemModel()
+        self.win_settings.listView_message_in.setModel(self.model_message_in)
         message_in_types = config_get_options('types_dict_message_in')
         for i in message_in_types:
             if i != '':
                 item = QtGui.QStandardItem(i)
-                model_message_in.appendRow(item)
+                self.model_message_in.appendRow(item)
+        self.sel_model_message_in = self.win_settings.listView_message_in.selectionModel()
+        self.sel_model_message_in.selectionChanged.connect(self.upd_btn_remove_message_in)
 
-        model_network = QtGui.QStandardItemModel()
-        self.open_modalwin_settings.listView_network.setModel(model_network)
+        self.model_network = QtGui.QStandardItemModel()
+        self.win_settings.listView_network.setModel(self.model_network)
         network_types = config_get_options('types_dict_network')
         for i in network_types:
             if i != '':
                 item = QtGui.QStandardItem(i)
-                model_network.appendRow(item)
+                self.model_network.appendRow(item)
+        self.sel_model_network = self.win_settings.listView_network.selectionModel()
+        self.sel_model_network.selectionChanged.connect(self.upd_btn_remove_network)
 
-        model_forwarding = QtGui.QStandardItemModel()
-        self.open_modalwin_settings.listView_forwarding.setModel(model_forwarding)
+        self.model_forwarding = QtGui.QStandardItemModel()
+        self.win_settings.listView_forwarding.setModel(self.model_forwarding)
         forwarding_types = config_get_options('types_dict_forwarding')
         for i in forwarding_types:
             if i != '':
                 item = QtGui.QStandardItem(i)
-                model_forwarding.appendRow(item)
+                self.model_forwarding.appendRow(item)
+        self.sel_model_forwarding = self.win_settings.listView_forwarding.selectionModel()
+        self.sel_model_forwarding.selectionChanged.connect(self.upd_btn_remove_forwarding)
 
+        # ЗАПОВНЕННЯ ComboBox КОЛОНОК РОЗПІЗНАННЯ:----------------------------------------------------------------------
+        self.win_settings.comboBox_choose_import_column.clear()
+        incoming_col_types_var = config_get_options('columns_incoming_names')
+        incoming_col_types_names = []
+        for var in incoming_col_types_var:
+            incoming_col_types_names.append(config_get_value('columns_incoming_names', str(var)))
+        self.win_settings.comboBox_choose_import_column.addItems(incoming_col_types_names)
+
+    # Функції кнопок списку типів розпізнання ВХІДНІ ДЗВІНКИ
     def upd_btn_remove_voice_in(self):
         if self.sel_model_voice_in.hasSelection():
-            self.open_modalwin_settings.btn_remove_voice_in.setEnabled(True)
+            self.win_settings.btn_remove_voice_in.setEnabled(True)
         else:
-            self.open_modalwin_settings.btn_remove_voice_in.setEnabled(False)
+            self.win_settings.btn_remove_voice_in.setEnabled(False)
 
     def upd_btn_add_voice_in(self):
-        if self.open_modalwin_settings.lineEdit_add_voice_in.text() != '':
-            self.open_modalwin_settings.btn_add_voice_in.setEnabled(True)
+        if self.win_settings.lineEdit_add_voice_in.text() != '':
+            self.win_settings.btn_add_voice_in.setEnabled(True)
         else:
-            self.open_modalwin_settings.btn_add_voice_in.setEnabled(False)
+            self.win_settings.btn_add_voice_in.setEnabled(False)
 
     def upd_list_voice_in(self):
         self.model_voice_in.clear()
@@ -387,18 +445,199 @@ class SettingsWindow(QtWidgets.QWidget):
             index = self.sel_model_voice_in.currentIndex()
             text = index.data()
             row = index.row()
-            print(row)
             config_remove_item('types_dict_voice_in', str(text))
             self.model_voice_in.removeRow(row)
             self.sel_model_voice_in.clearSelection()
 
     def add_item_voice_in(self):
-        if self.open_modalwin_settings.lineEdit_add_voice_in.text() != '':
-            config_set_item('types_dict_voice_in', str(self.open_modalwin_settings.lineEdit_add_voice_in.text()), str('True'))
-            self.open_modalwin_settings.lineEdit_add_voice_in.clear()
+        if self.win_settings.lineEdit_add_voice_in.text() != '':
+            config_set_item('types_dict_voice_in', str(self.win_settings.lineEdit_add_voice_in.text()), str('True'))
+            self.win_settings.lineEdit_add_voice_in.clear()
             self.upd_list_voice_in()
 
+    # Функції кнопок списку типів розпізнання ВИХІДНІ ДЗВІНКИ
+    def upd_btn_remove_voice_out(self):
+        if self.sel_model_voice_out.hasSelection():
+            self.win_settings.btn_remove_voice_out.setEnabled(True)
+        else:
+            self.win_settings.btn_remove_voice_out.setEnabled(False)
 
+    def upd_btn_add_voice_out(self):
+        if self.win_settings.lineEdit_add_voice_out.text() != '':
+            self.win_settings.btn_add_voice_out.setEnabled(True)
+        else:
+            self.win_settings.btn_add_voice_out.setEnabled(False)
+
+    def upd_list_voice_out(self):
+        self.model_voice_out.clear()
+        voice_out_types = config_get_options('types_dict_voice_out')
+        for i in voice_out_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                self.model_voice_out.appendRow(item)
+
+    def remove_voice_out_item(self):
+        if self.sel_model_voice_out.hasSelection():
+            index = self.sel_model_voice_out.currentIndex()
+            text = index.data()
+            row = index.row()
+            config_remove_item('types_dict_voice_out', str(text))
+            self.model_voice_out.removeRow(row)
+            self.sel_model_voice_out.clearSelection()
+
+    def add_item_voice_out(self):
+        if self.win_settings.lineEdit_add_voice_out.text() != '':
+            config_set_item('types_dict_voice_out', str(self.win_settings.lineEdit_add_voice_out.text()), str('True'))
+            self.win_settings.lineEdit_add_voice_out.clear()
+            self.upd_list_voice_out()
+
+    # Функції кнопок списку типів розпізнання ВХІДНІ ПОВІДОМЛЕННЯ 
+    def upd_btn_remove_message_in(self):
+        if self.sel_model_message_in.hasSelection():
+            self.win_settings.btn_remove_message_in.setEnabled(True)
+        else:
+            self.win_settings.btn_remove_message_in.setEnabled(False)
+
+    def upd_btn_add_message_in(self):
+        if self.win_settings.lineEdit_add_message_in.text() != '':
+            self.win_settings.btn_add_message_in.setEnabled(True)
+        else:
+            self.win_settings.btn_add_message_in.setEnabled(False)
+
+    def upd_list_message_in(self):
+        self.model_message_in.clear()
+        message_in_types = config_get_options('types_dict_message_in')
+        for i in message_in_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                self.model_message_in.appendRow(item)
+
+    def remove_message_in_item(self):
+        if self.sel_model_message_in.hasSelection():
+            index = self.sel_model_message_in.currentIndex()
+            text = index.data()
+            row = index.row()
+            config_remove_item('types_dict_message_in', str(text))
+            self.model_message_in.removeRow(row)
+            self.sel_model_message_in.clearSelection()
+
+    def add_item_message_in(self):
+        if self.win_settings.lineEdit_add_message_in.text() != '':
+            config_set_item('types_dict_message_in', str(self.win_settings.lineEdit_add_message_in.text()), str('True'))
+            self.win_settings.lineEdit_add_message_in.clear()
+            self.upd_list_message_in()
+
+    # Функції кнопок списку типів розпізнання ВИХІДНІ ПОВІДОМЛЕННЯ 
+    def upd_btn_remove_message_out(self):
+        if self.sel_model_message_out.hasSelection():
+            self.win_settings.btn_remove_message_out.setEnabled(True)
+        else:
+            self.win_settings.btn_remove_message_out.setEnabled(False)
+
+    def upd_btn_add_message_out(self):
+        if self.win_settings.lineEdit_add_message_out.text() != '':
+            self.win_settings.btn_add_message_out.setEnabled(True)
+        else:
+            self.win_settings.btn_add_message_out.setEnabled(False)
+
+    def upd_list_message_out(self):
+        self.model_message_out.clear()
+        message_out_types = config_get_options('types_dict_message_out')
+        for i in message_out_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                self.model_message_out.appendRow(item)
+
+    def remove_message_out_item(self):
+        if self.sel_model_message_out.hasSelection():
+            index = self.sel_model_message_out.currentIndex()
+            text = index.data()
+            row = index.row()
+            config_remove_item('types_dict_message_out', str(text))
+            self.model_message_out.removeRow(row)
+            self.sel_model_message_out.clearSelection()
+
+    def add_item_message_out(self):
+        if self.win_settings.lineEdit_add_message_out.text() != '':
+            config_set_item('types_dict_message_out', str(self.win_settings.lineEdit_add_message_out.text()), str('True'))
+            self.win_settings.lineEdit_add_message_out.clear()
+            self.upd_list_message_out()
+
+    # Функції кнопок списку типів розпізнання ІНТЕРНЕТ 
+    def upd_btn_remove_network(self):
+        if self.sel_model_network.hasSelection():
+            self.win_settings.btn_remove_network.setEnabled(True)
+        else:
+            self.win_settings.btn_remove_network.setEnabled(False)
+
+    def upd_btn_add_network(self):
+        if self.win_settings.lineEdit_add_network.text() != '':
+            self.win_settings.btn_add_network.setEnabled(True)
+        else:
+            self.win_settings.btn_add_network.setEnabled(False)
+
+    def upd_list_network(self):
+        self.model_network.clear()
+        network_types = config_get_options('types_dict_network')
+        for i in network_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                self.model_network.appendRow(item)
+
+    def remove_network_item(self):
+        if self.sel_model_network.hasSelection():
+            index = self.sel_model_network.currentIndex()
+            text = index.data()
+            row = index.row()
+            config_remove_item('types_dict_network', str(text))
+            self.model_network.removeRow(row)
+            self.sel_model_network.clearSelection()
+
+    def add_item_network(self):
+        if self.win_settings.lineEdit_add_network.text() != '':
+            config_set_item('types_dict_network', str(self.win_settings.lineEdit_add_network.text()), str('True'))
+            self.win_settings.lineEdit_add_network.clear()
+            self.upd_list_network()
+
+    # Методи кнопок списку типів розпізнання ПЕРЕАДРЕСАЦІЯ
+    def upd_btn_remove_forwarding(self):
+        if self.sel_model_forwarding.hasSelection():
+            self.win_settings.btn_remove_forwarding.setEnabled(True)
+        else:
+            self.win_settings.btn_remove_forwarding.setEnabled(False)
+
+    def upd_btn_add_forwarding(self):
+        if self.win_settings.lineEdit_add_forwarding.text() != '':
+            self.win_settings.btn_add_forwarding.setEnabled(True)
+        else:
+            self.win_settings.btn_add_forwarding.setEnabled(False)
+
+    def upd_list_forwarding(self):
+        self.model_forwarding.clear()
+        forwarding_types = config_get_options('types_dict_forwarding')
+        for i in forwarding_types:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                self.model_forwarding.appendRow(item)
+
+    def remove_forwarding_item(self):
+        if self.sel_model_forwarding.hasSelection():
+            index = self.sel_model_forwarding.currentIndex()
+            text = index.data()
+            row = index.row()
+            config_remove_item('types_dict_forwarding', str(text))
+            self.model_forwarding.removeRow(row)
+            self.sel_model_forwarding.clearSelection()
+
+    def add_item_forwarding(self):
+        if self.win_settings.lineEdit_add_forwarding.text() != '':
+            config_set_item('types_dict_forwarding', str(self.win_settings.lineEdit_add_forwarding.text()), str('True'))
+            self.win_settings.lineEdit_add_forwarding.clear()
+            self.upd_list_forwarding()
+
+    # -------------------------------------------------------------------------------
+    # МЕТОДИ КНОПОК ГОЛОВНОЇ ВКЛАДКИ НАЛАШТУВАНЬ ------------------------------------
+    # -------------------------------------------------------------------------------
     def swipe_to_factory(self):
         config_swipe()
         self.signal.signal_settings_changed.emit()
@@ -428,7 +667,6 @@ class SettingsWindow(QtWidgets.QWidget):
             self.signal.signal_update_statusbar.emit(text)
             self.signal.signal_settings_changed.emit()
 
-
     def settings_win_close_without_save(self):
         config_load('config\\config.ini')
         print('Settings closed without save')
@@ -450,29 +688,34 @@ class SettingsWindow(QtWidgets.QWidget):
         self.signal.signal_update_statusbar.emit(text)
         print('Changes accepted and save to config')
 
-    # ---------------------------МЕТОД оновлення значень вікна налаштувань при їх зміні--------------------------------
+    # -------------------------------------------------------------------------------
+    # МЕТОДИ ОНОВЛЕННЯ ВСЬОГО ВІКНА НАЛАШТУВАНЬ- -------------------------------------------
+    # -------------------------------------------------------------------------------
     def update_settings_gui(self):
-        self.open_modalwin_settings.label_import_dir_default.setText(
+        self.win_settings.label_import_dir_default.setText(
             config_get_value('import_folder_default', 'path'))  # оновлення типової папки імпорту
-
         # Оновлення рядків зі списоком типів (як будуть відображатися в готовій таблиці):
-        self.open_modalwin_settings.lineEdit_exportname_voice_in.setText(
+        self.win_settings.lineEdit_exportname_voice_in.setText(
             config_get_value('types_con_main_display_names', 'voice_in'))
-        self.open_modalwin_settings.lineEdit_exportname_voice_out.setText(
+        self.win_settings.lineEdit_exportname_voice_out.setText(
             config_get_value('types_con_main_display_names', 'voice_out'))
-        self.open_modalwin_settings.lineEdit_exportname_message_in.setText(
+        self.win_settings.lineEdit_exportname_message_in.setText(
             config_get_value('types_con_main_display_names', 'message_in'))
-        self.open_modalwin_settings.lineEdit_exportname_message_out.setText(
+        self.win_settings.lineEdit_exportname_message_out.setText(
             config_get_value('types_con_main_display_names', 'message_out'))
-        self.open_modalwin_settings.lineEdit_exportname_network.setText(
+        self.win_settings.lineEdit_exportname_network.setText(
             config_get_value('types_con_main_display_names', 'network'))
-        self.open_modalwin_settings.lineEdit_exportname_forwarding.setText(
+        self.win_settings.lineEdit_exportname_forwarding.setText(
             config_get_value('types_con_main_display_names', 'forwarding'))
-        self.open_modalwin_settings.lineEdit_exportname_unknowntypes.setText(
+        self.win_settings.lineEdit_exportname_unknowntypes.setText(
             config_get_value('types_con_main_display_names', 'unknown'))
-
         # Оновлення списків типів для розпізнання:
         self.upd_list_voice_in()
+        self.upd_list_voice_out()
+        self.upd_list_message_in()
+        self.upd_list_message_out()
+        self.upd_list_network()
+        self.upd_list_forwarding()
         #
 
 
