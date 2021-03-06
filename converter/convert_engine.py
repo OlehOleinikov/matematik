@@ -5,7 +5,7 @@ from colorama import Back
 from lxml import etree as et
 
 from .columns_functions import *
-
+from config.config_math import config_get_dict
 
 # -------------------------------------------------------------------------------------
 # ---------------------------------PROGRAM SETTINGS VARS-------------------------------

@@ -1,5 +1,13 @@
 <RCC>
   <qresource prefix="pics">
+    <file>gui_res/start1.ico</file>
+    <file>gui_res/start2.ico</file>
+    <file>gui_res/white_icons/asmallworld.png</file>
+    <file>gui_res/white_icons/exclamation.png</file>
+    <file>gui_res/white_icons/arrow.png</file>
+    <file>gui_res/white_icons/email.png</file>
+    <file>gui_res/white_icons/idm.png</file>
+    <file>gui_res/white_icons/viber.png</file>
     <file>gui_res/ico_ser.ico</file>
     <file>gui_res/ico_mathman.ico</file>
     <file>gui_res/ico_map.ico</file>
@@ -13,6 +21,32 @@
     <file>gui_res/ico_analyze_single.ico</file>
     <file>gui_res/ico_sheets.ico</file>
     <file>gui_res/math_logo.png</file>
+  </qresource>
+  <qresource prefix="white_icons">
+    <file>gui_res/files_ico/csv.png</file>
+    <file>gui_res/files_ico/doc.png</file>
+    <file>gui_res/files_ico/txt.png</file>
+    <file>gui_res/files_ico/xls.png</file>
+    <file>gui_res/files_ico/xml.png</file>
+    <file>gui_res/white_icons/add.png</file>
+    <file>gui_res/white_icons/back up.png</file>
+    <file>gui_res/white_icons/cancel.png</file>
+    <file>gui_res/white_icons/check.png</file>
+    <file>gui_res/white_icons/checked.png</file>
+    <file>gui_res/white_icons/cogwheel.png</file>
+    <file>gui_res/white_icons/control panel.png</file>
+    <file>gui_res/white_icons/customizer.png</file>
+    <file>gui_res/white_icons/equalizer.png</file>
+    <file>gui_res/white_icons/folder 3.png</file>
+    <file>gui_res/white_icons/folder documents.png</file>
+    <file>gui_res/white_icons/grou-ps.png</file>
+    <file>gui_res/white_icons/information.png</file>
+    <file>gui_res/white_icons/list.png</file>
+    <file>gui_res/white_icons/minus.png</file>
+    <file>gui_res/white_icons/plus.png</file>
+    <file>gui_res/white_icons/recycle.png</file>
+    <file>gui_res/white_icons/task.png</file>
+    <file>gui_res/white_icons/tuerca.png</file>
   </qresource>
   <qresource prefix="BW">
     <file>gui_res/ico_import.ico</file>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>997</width>
-    <height>853</height>
+    <width>1015</width>
+    <height>733</height>
    </rect>
   </property>
   <property name="contextMenuPolicy">
@@ -40,7 +40,7 @@
         </property>
        </spacer>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="label">
         <property name="maximumSize">
          <size>
@@ -90,21 +90,54 @@
       <item>
        <widget class="QPushButton" name="btn_clear_all">
         <property name="text">
-         <string>Очистити все</string>
+         <string> Почати знову</string>
+        </property>
+        <property name="icon">
+         <iconset resource="res_file.qrc">
+          <normaloff>:/white_icons/gui_res/white_icons/recycle.png</normaloff>:/white_icons/gui_res/white_icons/recycle.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>31</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btn_settings_win">
         <property name="text">
-         <string>Налаштування</string>
+         <string> Налаштування</string>
+        </property>
+        <property name="icon">
+         <iconset resource="res_file.qrc">
+          <normaloff>:/white_icons/gui_res/white_icons/cogwheel.png</normaloff>:/white_icons/gui_res/white_icons/cogwheel.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>31</height>
+         </size>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btn_help_win">
         <property name="text">
-         <string>Допомога</string>
+         <string>  Допомога</string>
+        </property>
+        <property name="icon">
+         <iconset resource="res_file.qrc">
+          <normaloff>:/white_icons/gui_res/white_icons/information.png</normaloff>:/white_icons/gui_res/white_icons/information.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>21</width>
+          <height>31</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -127,7 +160,17 @@
       <item>
        <widget class="QPushButton" name="btn_exit">
         <property name="text">
-         <string>Вихід</string>
+         <string>  Вихід</string>
+        </property>
+        <property name="icon">
+         <iconset resource="res_file.qrc">
+          <normaloff>:/white_icons/gui_res/white_icons/cancel.png</normaloff>:/white_icons/gui_res/white_icons/cancel.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>25</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -154,8 +197,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>25</width>
-          <height>25</height>
+          <width>30</width>
+          <height>30</height>
          </size>
         </property>
         <property name="elideMode">
@@ -164,7 +207,7 @@
         <widget class="QWidget" name="tab_converter">
          <attribute name="icon">
           <iconset resource="res_file.qrc">
-           <normaloff>:/BW/gui_res/ico_import.ico</normaloff>:/BW/gui_res/ico_import.ico</iconset>
+           <normaloff>:/white_icons/gui_res/files_ico/xls.png</normaloff>:/white_icons/gui_res/files_ico/xls.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Конвертер</string>
@@ -220,35 +263,131 @@
              </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_import_buttons" stretch="0,0,0,0,0,0">
+             <layout class="QVBoxLayout" name="verticalLayout_import_buttons" stretch="0,0,0,0,0,0,0,0">
               <property name="spacing">
                <number>5</number>
               </property>
               <item>
+               <spacer name="verticalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item alignment="Qt::AlignHCenter">
                <widget class="QPushButton" name="btn_sheet_add">
+                <property name="minimumSize">
+                 <size>
+                  <width>45</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>65</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
-                 <string>Додати</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="res_file.qrc">
+                  <normaloff>:/white_icons/gui_res/white_icons/plus.png</normaloff>:/white_icons/gui_res/white_icons/plus.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>21</width>
+                  <height>25</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item alignment="Qt::AlignHCenter">
+               <widget class="QPushButton" name="btn_sheet_remove">
+                <property name="minimumSize">
+                 <size>
+                  <width>45</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>65</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="res_file.qrc">
+                  <normaloff>:/white_icons/gui_res/white_icons/minus.png</normaloff>:/white_icons/gui_res/white_icons/minus.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>21</width>
+                  <height>25</height>
+                 </size>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="btn_sheet_remove">
-                <property name="text">
-                 <string>Видалити</string>
+               <spacer name="verticalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
                 </property>
-               </widget>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
               <item>
                <widget class="QPushButton" name="btn_sheet_import_def_dir">
                 <property name="text">
-                 <string>Папка імпорту</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="res_file.qrc">
+                  <normaloff>:/white_icons/gui_res/white_icons/folder documents.png</normaloff>:/white_icons/gui_res/white_icons/folder documents.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>25</width>
+                  <height>25</height>
+                 </size>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="btn_sheet_clear_list">
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
-                 <string>Очистити</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="res_file.qrc">
+                  <normaloff>:/white_icons/gui_res/white_icons/back up.png</normaloff>:/white_icons/gui_res/white_icons/back up.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>21</width>
+                  <height>21</height>
+                 </size>
                 </property>
                </widget>
               </item>
@@ -268,7 +407,17 @@
               <item>
                <widget class="QPushButton" name="btn_sheet_start_convert">
                 <property name="text">
-                 <string>КОНВЕРТУВАТИ</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="res_file.qrc">
+                  <normaloff>:/pics/gui_res/start2.ico</normaloff>:/pics/gui_res/start2.ico</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>25</width>
+                  <height>25</height>
+                 </size>
                 </property>
                </widget>
               </item>
@@ -292,7 +441,7 @@
               <property name="minimumSize">
                <size>
                 <width>160</width>
-                <height>0</height>
+                <height>250</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -344,7 +493,7 @@
               <property name="minimumSize">
                <size>
                 <width>160</width>
-                <height>0</height>
+                <height>250</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -408,7 +557,7 @@
               <property name="maximumSize">
                <size>
                 <width>450</width>
-                <height>260</height>
+                <height>250</height>
                </size>
               </property>
               <property name="title">
@@ -866,12 +1015,79 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>997</width>
+     <width>1015</width>
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="action_6"/>
+    <addaction name="action_7"/>
+    <addaction name="separator"/>
+    <addaction name="action_9"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Налаштування</string>
+    </property>
+    <addaction name="action_3"/>
+    <addaction name="action_4"/>
+    <addaction name="action_5"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>Про програму</string>
+    </property>
+    <addaction name="action"/>
+    <addaction name="action_2"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action">
+   <property name="text">
+    <string>Версія</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>Допомога</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>Розпізнання колонок</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>Розпізнання типів з'єднань</string>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string>Керування конфігурацією</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>Завантажити таблиці</string>
+   </property>
+  </action>
+  <action name="action_7">
+   <property name="text">
+    <string>Завантажити папку</string>
+   </property>
+  </action>
+  <action name="action_9">
+   <property name="text">
+    <string>Вихід</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="res_file.qrc"/>

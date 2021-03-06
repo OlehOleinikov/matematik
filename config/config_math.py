@@ -39,6 +39,16 @@ def config_remove_item(section, option):
     current_config.remove_option(section, option)
 
 
+def config_get_dict(section):
+    tpls = current_config.items(section)
+    working_dict = {}
+    working_dict.clear()
+    for pair in tpls:
+        link = {pair[0]: pair[1]}
+        working_dict.update(link)
+    return working_dict
+
+
 current_config = ConfigParser()  # об'єкт конфігурації, яка використовується під час роботи
 config_file_loaded_status = current_config.read('config\\config.ini') # завантаження користувацьких налаштувань
 if config_file_loaded_status == []: # перевірка наявності файлу конфігу, відновлення у разі відсутності

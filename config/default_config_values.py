@@ -42,9 +42,9 @@ default_config['columns_export_names'] = {
 # види колонок, які можуть бути в імпортованому файлі та їх підписи в інтерфейсі GUI:
 default_config['columns_incoming_names'] = {
     'type': 'Тип з\'єднання',
-    'date': 'Дата або Дата/Час (в одній колонці)',
+    'date': 'Дата або Дата/Час в одній колонці',
     'time': 'Тільки час',
-    'date_end': 'Дата\'час завершення з\'єднання',
+    'date_end': 'Дата/час завершення з\'єднання (необов\'язково)',
     'dur': 'Тривалість з\'єднання',
     'sim_a': 'Абонент А (основний абонент)',
     'imei_a': 'ІМЕІ А',
@@ -52,33 +52,20 @@ default_config['columns_incoming_names'] = {
     'sim_b': 'Абонент Б (співрозмовник)',
     'imei_b': 'ІМЕІ Б',
     'desc_b': 'Підпис власника Б',
-    'sim_c': 'Абонент, що здійснює виклик',
-    'sim_d': 'Абонент, що приймає виклик',
+    'sim_c': 'Абонент, що здійснює виклик (переважно Life)',
+    'sim_d': 'Абонент, що приймає виклик (переважно Life)',
+    'forw': 'Переадресація (перважно KyivStar)',
     'lac_a': 'LAC (зона БС) абонента А',
     'cid_a': 'Cid (номер БС) абонента А',
     'lac_cid': 'LAC+Cid абонента А (в одній колонці)',
     'az_a': 'Азимут БС абонента А',
-    'adr_a': 'Адреса розміщення БС - А',
-    'adr_az': 'Адреса та азимут БС в одній колонці - А',
+    'adr_a': 'Адреса розміщення БС - А (допускається з азимутом)',
     'lac_b': 'LAC (зона БС) абонента Б',
     'cid_b': 'Cid (номер БС) абонента Б',
     'az_b': 'Азимут БС абонента Б',
     'adr_b': 'Адреса розміщення БС - Б',
-    'imsi': 'IMSI SIM-картки',
-    'network': 'Мережа оператора',
-    'ip': 'Окрема колонка ІР-адреси',
     'column_ignore': 'Список колонок для ігнорування програмою'
 }
-# нумерований список типів з'єднань (можливо краще видалити цей проміжний етап):
-default_config['types_con_main_enum'] = {
-    'voice_in': '1',
-    'voice_out': '2',
-    'message_in': '3',
-    'message_out': '4',
-    'network': '5',
-    'forwarding': '6',
-    'unknown': '7'
-    }
 
 # інвертування типів для зміни абонентів А та Б місцями:
 default_config['types_con_main_invert_rules'] = {
@@ -228,6 +215,7 @@ default_config['columns_dict_adr_b'] = {
     'Адреса Б': 'adr_b',
     'Адреса БС Б': 'adr_b',
     'Адресс Б': 'adr_b',
+    'Адрес Б': 'adr_b',
     'Сота B': 'adr_b'}
 
 # список розпізнання колонки - азимут БС абонента А:
@@ -246,6 +234,13 @@ default_config['columns_dict_az_a'] = {
 # список розпізнання колонки - азимут БС абонента Б:
 default_config['columns_dict_az_b'] = {
     'Аз.Б': 'az_b',
+    'Аз Б': 'az_b',
+    'Az.Б': 'az_b',
+    'Az Б': 'az_b',
+    'Az B': 'az_b',
+    'Az. B': 'az_b',
+    'Azimut B': 'az_b',
+    'Azimuth B': 'az_b',
     'Азимут B': 'az_b'}
 
 # список розпізнання колонки - номер БС (Сід) абонента А:
@@ -262,21 +257,23 @@ default_config['columns_dict_cid_a'] = {
 # список розпізнання колонки - номер БС (Сід) абонента Б:
 default_config['columns_dict_cid_b'] = {
     'CID B': 'cid_b',
+    'Cell B': 'cid_b',
+    'Cel B': 'cid_b',
+    'Cell Б': 'cid_b',
+    'Cel Б': 'cid_b',
     'CID Б': 'cid_b'}
 
-# список розпізнання колонки - Дата:
-default_config['columns_dict_date'] = {
-    'дата': 'date'}
 
-# список розпізнання колонки - Дата та час:
-default_config['columns_dict_date_time'] = {
-    'CALL_DATE_TIME': 'date_time',
-    'STARTTIME': 'date_time',
-    'Дата и время соединения': 'date_time',
-    'Дата начала': 'date_time',
-    'Дата та час': 'date_time',
-    'Дата та час з\'єднання': 'date_time',
-    'Нач звон': 'date_time'}
+# список розпізнання колонки - Дата або Дата та час в одній колонці:
+default_config['columns_dict_date'] = {
+    'дата': 'date',
+    'CALL_DATE_TIME': 'date',
+    'STARTTIME': 'date',
+    'Дата и время соединения': 'date',
+    'Дата начала': 'date',
+    'Дата та час': 'date',
+    'Дата та час з\'єднання': 'date',
+    'Нач звон': 'date'}
 
 # список розпізнання колонки - Тривалість:
 default_config['columns_dict_dur'] = {
@@ -306,13 +303,14 @@ default_config['columns_dict_imei_b'] = {
     'ІМЕІ Б': 'imei_b'}
 
 #  список розпізнання колонок, що не мають значення для роботи конвертеру (додаткові):
-default_config['columns_dict_other'] = {
-    'IMSI': 'imsi',
-    'Ip': 'ip',
-    'IP Address доступа в Internet': 'ip',
-    'IP-Address доступа в Internet': 'ip',
-    'IP-Address доступу в Internet': 'ip',
-    'Мережа': 'network'}
+default_config['columns_dict_column_ignore'] = {
+    'IMSI': 'column_ignore',
+    'Країна': 'column_ignore',
+    'Ip': 'column_ignore',
+    'IP Address доступа в Internet': 'column_ignore',
+    'IP-Address доступа в Internet': 'column_ignore',
+    'IP-Address доступу в Internet': 'column_ignore',
+    'Мережа': 'column_ignore'}
 
 # список розпізнання колонки - зони (регіону, ЛАК) абонента А:
 default_config['columns_dict_lac_a'] = {
@@ -326,6 +324,7 @@ default_config['columns_dict_lac_a'] = {
 # список розпізнання колонки - зони (регіону, ЛАК) абонента Б:
 default_config['columns_dict_lac_b'] = {
     'LAC B': 'lac_b',
+    'LAC В': 'lac_b',
     'LAC Б': 'lac_b'}
 
 # список розпізнання колонки - в якій поєднано ЛАК та Сід -  абонента А
@@ -377,3 +376,31 @@ default_config['columns_dict_type'] = {
     'Тип з\'єднання': 'type',
     'Тип соед.': 'type',
     'Тип соединения': 'type'}
+
+# список розпізнання колонки - Переадресація (переважно для Київстар):
+default_config['columns_dict_forw'] = {
+    'Переадресація': 'forw',
+    'Переадресация': 'forw'}
+
+# список розпізнання колонки - дата та час завершення дзвінка (необовязково):
+default_config['columns_dict_date_end'] = {
+    'CALLEND': 'date_end',
+    'CALLDATEEND': 'date_end',
+    'CALL_DATE_END': 'date_end',
+    'CALLDATE_END': 'date_end',
+    'CALL_END': 'date_end'}
+
+# список розпізнання колонки - підпис основного абонента (А):
+default_config['columns_dict_desc_a'] = {
+    'Підпис А': 'desc_a',
+    'Власник': 'desc_a',
+    'Власник А': 'desc_a',
+    'Відомості про власника': 'desc_a',
+    'Відомості про власника А': 'desc_a'}
+
+# список розпізнання колонки - підпис співрозмовника (Б):
+default_config['columns_dict_desc_b'] = {
+    'Підпис Б': 'desc_a',
+    'Власник Б': 'desc_a',
+    'Відомості про власника Б': 'desc_a'}
+

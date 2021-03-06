@@ -5,7 +5,7 @@ from gui.gui_import_folder import *
 
 
 from config.config_math import config_get_value, config_set_item, config_save, config_load, config_swipe, \
-    config_get_options, config_remove_item
+    config_get_options, config_remove_item, config_get_dict
 
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QThread, QEvent
 from PyQt5.Qt import QProxyStyle, QStyle
@@ -52,6 +52,8 @@ supported_types = ('.xls', '.xlsx', '.xml', '.txt', '.csv', '.txt', '.dec')
 # 19) лог опрацювання файлу для відображення у вікні результатів
 availible_sheets_list = []
 
+
+
 # Заголовки колонок відображення обраних до опрацювання файлів (для використання у моделі даних Qt):
 input_files_default_headers_set = ['Шлях', 'Файл', 'Розмір', 'Відбиток', 'Записів', 'Колонок', 'Типів',
                                    'Абонентів А/Б', 'IMEI', 'Зон/антен', 'Визначений тип']
@@ -59,7 +61,6 @@ input_files_default_headers_set = ['Шлях', 'Файл', 'Розмір', 'Ві
 # Консольні функції (підлягають видаленню після переходу на GUI)
 colorama.init()
 print_logo()
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------ХЕНДЛЕР ПОДІЙ---------------------------------------------------------
@@ -165,8 +166,8 @@ class MainWinMatematik(QtWidgets.QMainWindow):
 
     # -----------------------------------------методи ВІДКРИТТЯ ВІКОН --------------------------------------------------
     def open_modalwin_settings(self):
-        flags = Qt.WindowFlags(Qt.FramelessWindowHint | Qt.Window)
-        self.win_settings.setWindowFlags(flags)
+        # flags = Qt.WindowFlags(Qt.FramelessWindowHint | Qt.Window)
+        # self.win_settings.setWindowFlags(flags)
         self.win_settings.show()
 
     def open_modalwin_import_folder(self):
@@ -335,6 +336,63 @@ class SettingsWindow(QtWidgets.QWidget):
         self.win_settings.lineEdit_add_network.textChanged.connect(self.upd_btn_add_network)
         self.win_settings.lineEdit_add_forwarding.textChanged.connect(self.upd_btn_add_forwarding)
 
+        # Активація СПИСКУ найменувань КОЛОНОК для РОЗПІЗНАННЯ:
+        self.model_col_names_incoming = QtGui.QStandardItemModel()
+        self.model_col_names_incoming.clear()
+        self.win_settings.listView_keywords_col_replace.setModel(self.model_col_names_incoming)
+        self.sel_model_col_names_incoming = self.win_settings.listView_keywords_col_replace.selectionModel()
+        self.dict_inc_col_var_desc = config_get_dict('columns_incoming_names')
+        self.inv_dict_inc_col = {v: k for k, v in self.dict_inc_col_var_desc.items()}
+        self.dict_inc_col_var_to_config_section = {
+            'type': 'columns_dict_type',
+            'date': 'columns_dict_date',
+            'time': 'columns_dict_time',
+            'date_end': 'columns_dict_date_end',
+            'dur': 'columns_dict_dur',
+            'sim_a': 'columns_dict_sim_a',
+            'imei_a': 'columns_dict_imei_a',
+            'desc_a': 'columns_dict_desc_a',
+            'sim_b': 'columns_dict_sim_b',
+            'imei_b': 'columns_dict_imei_b',
+            'desc_b': 'columns_dict_desc_b',
+            'sim_c': 'columns_dict_sim_c',
+            'sim_d': 'columns_dict_sim_d',
+            'forw': 'columns_dict_forw',
+            'lac_a': 'columns_dict_lac_a',
+            'cid_a': 'columns_dict_cid_a',
+            'lac_cid': 'columns_dict_lac_cid',
+            'az_a': 'columns_dict_az_a',
+            'adr_a': 'columns_dict_adr_a',
+            'lac_b': 'columns_dict_lac_b',
+            'cid_b': 'columns_dict_cid_b',
+            'az_b': 'columns_dict_az_b',
+            'adr_b': 'columns_dict_adr_b',
+            'column_ignore': 'columns_dict_column_ignore'
+        }
+        self.win_settings.comboBox_choose_import_column.currentIndexChanged.connect(self.upd_list_col_incoming)
+        self.win_settings.btn_add_keyword_column.setEnabled(False)
+        self.win_settings.lineEdit_add_keyword_column.textChanged.connect(self.upd_btn_add_keyword_column)
+
+        self.win_settings.btn_remove_keyword_column.setEnabled(False)
+        self.win_settings.btn_remove_keyword_column.clicked.connect(self.remove_keyword_column_item)
+        self.win_settings.btn_add_keyword_column.clicked.connect(self.add_item_keyword_column)
+        self.win_settings.listView_keywords_col_replace.clicked.connect(self.upd_btn_remove_keyword_column)
+
+        # self.dict_export_column_names = config_get_dict('columns_export_names')
+        # self.column_export_names_count = len(self.dict_export_column_names)
+        # self.win_settings.table_columns_exportnames.setRowCount(self.column_export_names_count)
+        # self.column_export_names_tpl = [[k, v] for k, v in self.dict_export_column_names.items()]
+        # for row_col_export in range(self.column_export_names_count):
+        #     self.win_settings.table_columns_exportnames.setItem(row_col_export, 0, QtWidgets.QTableWidgetItem(str(self.column_export_names_tpl[row_col_export][0])))
+        #     self.win_settings.table_columns_exportnames.setItem(row_col_export, 1, QtWidgets.QTableWidgetItem(str(self.column_export_names_tpl[row_col_export][1])))
+        #     self.win_settings.table_columns_exportnames.item(row_col_export, 0).setFlags(QtCore.Qt.ItemIsEnabled)
+        # self.win_settings.table_columns_exportnames.resizeRowsToContents()
+        self.column_export_names_count = len(config_get_dict('columns_export_names'))
+        self.win_settings.table_columns_exportnames.setRowCount(self.column_export_names_count)
+        self.win_settings.table_columns_exportnames.itemChanged.connect(self.upd_col_export_name_config)
+        self.upd_col_export_names_list()
+
+
         # Завантаження НАЙМЕНУВАНЬ ТИПІВ для відображення у ЕКСПОРТОВАНИХ ТАБЛИЦЯХ:-------------------------------------
         self.win_settings.lineEdit_exportname_voice_in.textChanged.connect(
             lambda x: config_set_item('types_con_main_display_names', 'voice_in', str(x)))
@@ -419,6 +477,10 @@ class SettingsWindow(QtWidgets.QWidget):
         for var in incoming_col_types_var:
             incoming_col_types_names.append(config_get_value('columns_incoming_names', str(var)))
         self.win_settings.comboBox_choose_import_column.addItems(incoming_col_types_names)
+        self.win_settings.comboBox_choose_import_column.insertSeparator(5)
+        self.win_settings.comboBox_choose_import_column.insertSeparator(12)
+        self.win_settings.comboBox_choose_import_column.insertSeparator(16)
+        self.win_settings.comboBox_choose_import_column.insertSeparator(26)
 
     # Функції кнопок списку типів розпізнання ВХІДНІ ДЗВІНКИ
     def upd_btn_remove_voice_in(self):
@@ -689,8 +751,70 @@ class SettingsWindow(QtWidgets.QWidget):
         self.signal.signal_update_statusbar.emit(text)
         print('Changes accepted and save to config')
 
+    # ---------------------------------------------------------------------
+    # Робота з НАЛАШТУВАННЯМ КОЛОНОК---------------------------------------
+    # ---------------------------------------------------------------------
+    def upd_list_col_incoming(self):
+        self.model_col_names_incoming.clear()
+        current_columns_text = str(self.win_settings.comboBox_choose_import_column.currentText())
+        var_of_column_type = self.inv_dict_inc_col.get(current_columns_text)
+        section_to_view = self.dict_inc_col_var_to_config_section.get(var_of_column_type)
+        items_to_view = config_get_options(section_to_view)
+        for i in items_to_view:
+            if i != '':
+                item = QtGui.QStandardItem(i)
+                self.model_col_names_incoming.appendRow(item)
+
+    def upd_btn_add_keyword_column(self):
+        if self.win_settings.lineEdit_add_keyword_column.text() != '':
+            self.win_settings.btn_add_keyword_column.setEnabled(True)
+        else:
+            self.win_settings.btn_add_keyword_column.setEnabled(False)
+
+    def upd_btn_remove_keyword_column(self):
+        if self.sel_model_col_names_incoming.hasSelection():
+            self.win_settings.btn_remove_keyword_column.setEnabled(True)
+        else:
+            self.win_settings.btn_remove_keyword_column.setEnabled(False)
+
+    def remove_keyword_column_item(self):
+        if self.sel_model_col_names_incoming.hasSelection():
+            index = self.sel_model_col_names_incoming.currentIndex()
+            text = index.data()
+            row = index.row()
+            column_human_name = self.win_settings.comboBox_choose_import_column.currentText()
+            column_var_name = self.inv_dict_inc_col.get(column_human_name)
+            config_selection_name = self.dict_inc_col_var_to_config_section.get(column_var_name)
+            config_remove_item(config_selection_name, str(text))
+            self.model_col_names_incoming.removeRow(row)
+            self.sel_model_col_names_incoming.clearSelection()
+            self.upd_btn_remove_keyword_column()
+
+    def add_item_keyword_column(self):
+        if self.win_settings.lineEdit_add_keyword_column.text() != '':
+            column_human_name = self.win_settings.comboBox_choose_import_column.currentText()
+            column_var_name = self.inv_dict_inc_col.get(column_human_name)
+            config_selection_name = self.dict_inc_col_var_to_config_section.get(column_var_name)
+            config_set_item(config_selection_name, str(self.win_settings.lineEdit_add_keyword_column.text()), str(column_var_name))
+            self.win_settings.lineEdit_add_keyword_column.clear()
+            self.upd_list_col_incoming()
+
+    def upd_col_export_name_config(self, cell):
+        row = cell.row()
+        text = cell.text()
+        option = self.win_settings.table_columns_exportnames.item(row, 0).text()
+        config_set_item('columns_export_names', option, text)
+
+    def upd_col_export_names_list(self):
+        cur_dict = config_get_dict('columns_export_names')
+        cur_list = [[k, v] for k, v in cur_dict.items()]
+        for row_col_export in range(len(cur_list)):
+            self.win_settings.table_columns_exportnames.setItem(row_col_export, 0, QtWidgets.QTableWidgetItem(str(cur_list[row_col_export][0])))
+            self.win_settings.table_columns_exportnames.setItem(row_col_export, 1, QtWidgets.QTableWidgetItem(str(cur_list[row_col_export][1])))
+            # self.win_settings.table_columns_exportnames.item(row_col_export, 0).setFlags(QtCore.Qt.ItemIsEnabled)
+        self.win_settings.table_columns_exportnames.resizeRowsToContents()
     # -------------------------------------------------------------------------------
-    # МЕТОДИ ОНОВЛЕННЯ ВСЬОГО ВІКНА НАЛАШТУВАНЬ- -------------------------------------------
+    # МЕТОДИ ОНОВЛЕННЯ ВСЬОГО ВІКНА НАЛАШТУВАНЬ- ------------------------------------
     # -------------------------------------------------------------------------------
     def update_settings_gui(self):
         self.win_settings.label_import_dir_default.setText(
@@ -717,7 +841,8 @@ class SettingsWindow(QtWidgets.QWidget):
         self.upd_list_message_out()
         self.upd_list_network()
         self.upd_list_forwarding()
-        #
+        self.upd_list_col_incoming()
+        self.upd_col_export_names_list()
 
 
 # ---------------------------------------------------------------------------------------------------------------------
