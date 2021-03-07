@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SplashScreen</class>
+ <widget class="QMainWindow" name="SplashScreen">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>350</width>
+    <height>235</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QFrame" name="frame">
+      <property name="styleSheet">
+       <string notr="true">QFrame{
+	background-color: rgb(70, 70, 70);
+	border-color: None;
+	border-radius: 7px
+
+}</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <property name="topMargin">
+        <number>21</number>
+       </property>
+       <property name="rightMargin">
+        <number>12</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="logo_splash">
+           <property name="minimumSize">
+            <size>
+             <width>87</width>
+             <height>90</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>87</width>
+             <height>90</height>
+            </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="res_file.qrc">:/pics/gui_res/math_logo opas.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="lbl_prog_name">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>35</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 57 16pt &quot;Uni Neue Regular&quot;;
+color: rgb(192, 199, 212)</string>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;математик&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lbl_current_ver">
+         <property name="styleSheet">
+          <string notr="true">font: 57 8pt &quot;Uni Neue Regular&quot;;
+color: rgb(192, 199, 212)</string>
+         </property>
+         <property name="text">
+          <string>ver.1.1 build070321(unstable)</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="pb_splash">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>14</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QProgressBar{
+	
+	background-color: rgb(136, 136, 136);
+	border-radius: 7px;
+	border-style: None;
+	text-align: center;
+	color: rgb(192, 199, 212);
+	
+	font: 57 8pt &quot;Uni Neue Regular&quot;;
+
+	}
+QProgressBar::chunk{
+	border-radius: 7px;
+	background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0.789, stop:0 rgba(42, 130, 216, 255), stop:1 rgba(102, 184, 232, 255))
+}</string>
+         </property>
+         <property name="value">
+          <number>24</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lbl_text_loading">
+         <property name="styleSheet">
+          <string notr="true">color:  rgb(192, 199, 212);
+font: 57 8pt &quot;Uni Neue Regular&quot;;
+ </string>
+         </property>
+         <property name="text">
+          <string>Loading...</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="res_file.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,7 +1,9 @@
 import sys
 from gui.gui import *
 from gui.gui_settings import Ui_Form
+from gui.gui_splash import Ui_SplashScreen
 from gui.gui_import_folder import *
+
 
 
 from config.config_math import config_get_value, config_set_item, config_save, config_load, config_swipe, \
@@ -21,7 +23,8 @@ from tqdm import tqdm
 import qtmodern.styles
 import qtmodern.windows
 
-
+current_version = 'ver.1.1 build070321(unstable)'
+counter = 0
 prog_execute_stage = 0  # етапи програми для відображення активності елементів (до перегону, після перегону), глобальна
 supported_types = ('.xls', '.xlsx', '.xml', '.txt', '.csv', '.txt', '.dec')
 
@@ -128,7 +131,7 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         self.ui.groupBox_3.setDisabled(True)
         self.ui.groupBox_4.setDisabled(True)
         self.ui.btn_sheet_remove.setEnabled(False)  # кнопка активується якщо є виділені рядки списку файлів
-        #
+        self.ui.btn_sheet_start_convert.setDisabled(True)
 
         # -----------------------------------Підключення ТАБЛИЦІ конвертеру:-------------------------------------------
         # Підготовка форми таблиці для файлів обраних користувачем (для правильного відображення у віджеті
@@ -800,10 +803,11 @@ class SettingsWindow(QtWidgets.QWidget):
             self.upd_list_col_incoming()
 
     def upd_col_export_name_config(self, cell):
-        row = cell.row()
-        text = cell.text()
-        option = self.win_settings.table_columns_exportnames.item(row, 0).text()
-        config_set_item('columns_export_names', option, text)
+        if cell.column() == 1:
+            row = cell.row()
+            text = cell.text()
+            option = self.win_settings.table_columns_exportnames.item(row, 0).text()
+            config_set_item('columns_export_names', option, text)
 
     def upd_col_export_names_list(self):
         cur_dict = config_get_dict('columns_export_names')
@@ -811,7 +815,7 @@ class SettingsWindow(QtWidgets.QWidget):
         for row_col_export in range(len(cur_list)):
             self.win_settings.table_columns_exportnames.setItem(row_col_export, 0, QtWidgets.QTableWidgetItem(str(cur_list[row_col_export][0])))
             self.win_settings.table_columns_exportnames.setItem(row_col_export, 1, QtWidgets.QTableWidgetItem(str(cur_list[row_col_export][1])))
-            # self.win_settings.table_columns_exportnames.item(row_col_export, 0).setFlags(QtCore.Qt.ItemIsEnabled)
+            self.win_settings.table_columns_exportnames.item(row_col_export, 0).setFlags(QtCore.Qt.ItemIsEnabled)
         self.win_settings.table_columns_exportnames.resizeRowsToContents()
     # -------------------------------------------------------------------------------
     # МЕТОДИ ОНОВЛЕННЯ ВСЬОГО ВІКНА НАЛАШТУВАНЬ- ------------------------------------
@@ -865,16 +869,52 @@ class ChooseImportFolder(QtWidgets.QWidget):
         self.close()
         #
 
+# -----------------------------------------------------------------------------------------------------------------
+# -------------------------------------------ВІКНО ЗАВАНТАЖЕННЯ SPLASH WIN-----------------------------------------
+# -----------------------------------------------------------------------------------------------------------------
+class SplashScreen(QtWidgets.QMainWindow):
+    def __init__(self):
+        QtWidgets.QMainWindow.__init__(self)
+        self.ui = Ui_SplashScreen()
+        self.ui.setupUi(self)
+
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect(self)
+        self.shadow.setBlurRadius(20)
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 60))
+        self.ui.frame.setGraphicsEffect(self.shadow)
+
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.progress)
+        self.timer.start(25)
+
+        self.show()
+
+    def progress(self):
+        global counter
+        self.ui.pb_splash.setValue(counter)
+        if counter > 100:
+            self.timer.stop()
+            self.app = QtWidgets.QApplication(sys.argv)
+            qtmodern.styles.dark(self.app)
+            self.myapp = qtmodern.windows.ModernWindow(MainWinMatematik())
+            self.myapp.show()
+            # sys.exit(app.exec_())
+            self.close()
+        counter +=1
 
 # -----------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------ВИКОНАННЯ ПРОГРАМИ------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    qtmodern.styles.dark(app)
-    myapp = qtmodern.windows.ModernWindow(MainWinMatematik())
-    myapp.show()
+    # qtmodern.styles.dark(app)
+    myapp = SplashScreen()
+    # myapp.show()
     sys.exit(app.exec_())
 
 

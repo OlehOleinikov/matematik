@@ -20,6 +20,9 @@
    <iconset resource="res_file.qrc">
     <normaloff>:/pics/gui_res/ico_mathman.ico</normaloff>:/pics/gui_res/ico_mathman.ico</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true">font: 57 9pt &quot;Uni Neue Regular&quot;;</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
@@ -68,6 +71,20 @@
         </property>
         <property name="wordWrap">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="styleSheet">
+         <string notr="true">font: 57 18pt &quot;Uni Neue Regular&quot;;
+color: rgb(192, 199, 212)</string>
+        </property>
+        <property name="text">
+         <string>математик</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -557,7 +574,7 @@
               <property name="maximumSize">
                <size>
                 <width>450</width>
-                <height>250</height>
+                <height>270</height>
                </size>
               </property>
               <property name="title">
@@ -1016,7 +1033,7 @@
      <x>0</x>
      <y>0</y>
      <width>1015</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
