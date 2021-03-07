@@ -7,6 +7,35 @@ from lxml import etree as et
 from .columns_functions import *
 from config.config_math import config_get_dict
 
+
+counter_bs = 0  # відсоток опрацьованих файлів у функції пошуку довідників БС (для прогресбару)
+counter_files = 0  # відсоток опрацьованих файлів з інформацією про з*єднання
+
+FILE_PATH = 0
+FILE_NAME = 1
+FILE_SIZE = 2
+FILE_FOOTPRINT = 3
+RECORDS_DETECTED = 4
+RECORDS_CONVERTED = 5
+COLUMNS_DETECTED = 6
+COLUMNS_CONVERTED = 7
+TYPES_DETECTED = 8
+TYPES_CONVERTED = 9
+SIMA_UNIQ = 10
+SIMB_UNOQ = 11
+IMEIA_UNIQ = 12
+IMEIB_UNIQ = 13
+LAC_UNIQ = 14
+BS_UNIQ = 15
+BS_ADR_FIND = 16
+FUNC_SIM_CHOICE = 17
+FUNC_FORW_CHOICE = 18
+FUNC_BS_VOC = 19
+TYPE_FOUND = 20
+TAB_LOG = 21
+
+DEEP = 100  # num of rows for testing tab's type
+
 # -------------------------------------------------------------------------------------
 # ---------------------------------PROGRAM SETTINGS VARS-------------------------------
 # -------------------------------------------------------------------------------------
@@ -15,7 +44,7 @@ from config.config_math import config_get_dict
 #Перевіряється на повторне введення одного й того ж файлу.
 #Зберігає відомості про файл: абсолютний шлях(0), назва файлу(1), розмір(2), Колонки(3), Типи (4), Соти(5), Тип(6)
 #До перегону таблиць містить відомості тільки про шлях, назву файлу та розмір:
-sheets_list_prepared = []
+# sheets_list_prepared = []
 
 
 su_text_search = True  # setup to parse txt files in directory
@@ -34,7 +63,7 @@ tabs_count = 0  # count of files with data in directory
 tabs_to_work = 0  # tabs left
 tabs_cur_level = 0  # current stage in iter file(tab)
 tabs_done = 0  # number of done tabs
-test_frame_deep = 100  # num of rows for testing tab's type
+
 list_to_work = []  # files ready to combine with arguments (subscriber, type, BS voc status, "life" status)
 separate_abon_list = []
 
@@ -95,64 +124,13 @@ def convert_str_to_time(cell):
     return time_cell
 
 
-def dialog_user_start():
-    global su_save_heap, su_save_file_to_file, su_save_file_to_file, su_save_divide_by_subscriber, su_merge_ab_types
-    print(Fore.LIGHTWHITE_EX + Back.LIGHTBLACK_EX + 'ВВОД ЗАДАНИЙ:' + Style.RESET_ALL)
-    answer = input('Создать общий файл heap ("куча") для всех фрагментов? (y)')
-    if answer == 'y' or answer == 'Y':
-        su_save_heap = True
-        print(Fore.GREEN + '\tПринято. Будет создан общий файл (heap) для всех записей о соединениях...\n'
-              + Style.RESET_ALL)
-    else:
-        su_save_heap = False
-        print(Fore.RED + '\tПропускаю создание общего файла...\n' + Style.RESET_ALL)
-
-    answer = input('Создать отдельные файлы для каждого исходника "file-to-newfile"? (y)')
-    if answer == 'y' or answer == 'Y':
-        su_save_file_to_file = True
-        print(Fore.GREEN + '\tПринято. Для каждого исходника будет создан отдельный файл с форматированными '
-                           'записями...\n' + Style.RESET_ALL)
-    else:
-        su_save_file_to_file = False
-        print(Fore.RED + '\tПропускаю создание отдельных файлов для каждого исходника...\n' + Style.RESET_ALL)
-
-    answer = input('Разделить выходные файлы по абонентам (авторазбивка А/Б)? (y)')
-    if answer == 'y' or answer == 'Y':
-        su_save_divide_by_subscriber = True
-        print(Fore.GREEN + '\tПринято. Будут записаны отдельные файлы с разбивкой по абонентам...\n' + Style.RESET_ALL)
-    else:
-        su_save_divide_by_subscriber = False
-        print(Fore.RED + '\tПропускаю создание отдельных файлов с разбивкой по абонентам А/Б\n' + Style.RESET_ALL)
-
-    answer = input('Объединить таблицы типов А и Б? (y)')
-    if answer == 'y' or answer == 'Y':
-        su_merge_ab_types = True
-        print(Fore.GREEN + '\tПринято. Таблицы А и Б будут объеденены...\n' + Style.RESET_ALL)
-    else:
-        su_merge_ab_types = False
-        print(Fore.RED + '\tПропускаю объединение таблиц А и Б\n' + Style.RESET_ALL)
-
-    if su_save_heap == su_save_file_to_file == su_save_divide_by_subscriber == su_merge_ab_types is False:
-        print(Fore.RED + Back.LIGHTBLACK_EX + '\tНе введено ни одно задание. Работа остановлена' + Style.RESET_ALL)
-        time.sleep(6)
-        os.abort()
-
-
 def xml_parse_to_pandas(file_name):
     parser = et.XMLParser(recover=True, huge_tree=True)
     tree = et.parse(file_name, parser)
     root = tree.getroot()
-    print("СПРОБА КОНВЕРТАЦІЇ ТАБЛИЦІ XML")
-    print(file_name)
-    print(root)
     row_num = 0
     data_all_dict = {}
     table = root.find('.//{urn:schemas-microsoft-com:office:spreadsheet}Table')
-    table_attr = table.attrib
-    try:
-        number_of_columns_xml = int(table_attr.get('{urn:schemas-microsoft-com:office:spreadsheet}ExpandedColumnCount'))
-    except TypeError:
-        number_of_columns_xml = 10
     rows = table.findall('.//{urn:schemas-microsoft-com:office:spreadsheet}Row')
     for row in rows:
         data_pointers = row.findall('.//{urn:schemas-microsoft-com:office:spreadsheet}Data')
@@ -167,260 +145,131 @@ def xml_parse_to_pandas(file_name):
     return df_from_xml
 
 
-def set_new_dict(s):
-    print(Fore.GREEN + "Обнаружен файл конфигурации...", s)
-    b = pd.read_excel(s, header=None)
-    print("Правил принято:", len(b), Style.RESET_ALL)
-    c = tuple(zip(b[0], b[1]))
-    a = dict(c)
-    return a
 
 
-def scan_directory():
-    print(Fore.LIGHTWHITE_EX + Back.LIGHTBLACK_EX + 'Загрузка конфигурации, проверка директории...')
-    print(Style.RESET_ALL)
-    for file in os.listdir():
-        if file.endswith(".xlsx") | file.endswith(".xls") | file.endswith(".csv") | file.endswith(".xml"):
-            tabs_list.append(file)
-    if su_text_search:
-        for file in os.listdir():
-            if file.endswith(".txt"):
-                tabs_list.append(file)
 
-    # starting status info (check files in dir):
-    print("\nПоиск файлов данных в директории:")
-    print(os.getcwd())
-    print("Всего файлов обнаружено:", len(tabs_list), '\n')
+def convert_all(files_sheet: list):
+    print('func started')
+    global counter_bs  # для відображення прогресбару
+    global counter_files
+    counter_bs = 0  # скидання прогресбару на нуль перед початком опрацювання
+    counter_files = 0
 
-    # getting configuration dictionaries
-    if tabs_list.count("config_types.xlsx") > 0:
-        dict_types.update(set_new_dict("config_types.xlsx"))
-        tabs_list.remove("config_types.xlsx")
-    else:
-        print(Fore.RED + 'Отсутствует файл config_types. Продолжить невозможно! Всё *****, Миша, давай по-новой...')
-        print(Style.RESET_ALL)
-        time.sleep(6)
-        os.abort()
-    if tabs_list.count("config_columns.xlsx") > 0:
-        dict_columns.update(set_new_dict("config_columns.xlsx"))
-        tabs_list.remove("config_columns.xlsx")
-    else:
-        print(Fore.RED + 'Отсутствует файл config_columns. Продолжить невозможно! Всё *****, Миша, давай по-новой...')
-        print(Style.RESET_ALL)
-        time.sleep(6)
-        os.abort()
-    if tabs_list.count("config_bs_voc.xlsx") > 0:
-        dict_bs.update(set_new_dict("config_bs_voc.xlsx"))
-        tabs_list.remove("config_bs_voc.xlsx")
-    else:
-        print(Fore.RED + 'Отсутствует файл config_bs_voc. Продолжить невозможно! Всё *****, Миша, давай по-новой...')
-        print(Style.RESET_ALL)
-        time.sleep(6)
-        os.abort()
+    main_data_frame = pd.DataFrame()  # всі придатні записи додаються до цього фрейму та повертаються результатом
+    sheets_list_uploaded = files_sheet.copy()  # копія полотна з вхідними файлами
+    separated_sims = []
+    dict_bs_adr = {}  # збірник з відомостями про адреси БС (ключ(ЛАК+СІД): значення(строка з адресою))
+    dict_bs_azi = {}  # збірник з відомостями про азимути БС (ключ(ЛАК+СІД): значення(азимут))
+    bs_files = []  # список файлів (шлях з найменуванням) в яких знайдено довідники (для ігнорування конвертером)
+
+    file_weight_bs = 100/len(sheets_list_uploaded)  # вага одного файлу для корекції статусбару
+
+    for row in range(len(sheets_list_uploaded)):
+        try:
+            temp_dict_adr, temp_dict_azi, errors = search_bs_voc(sheets_list_uploaded[row], file_weight_bs)
+            # повертаються два словники для проставлення адрес БС у таблицях, помилки додаються до відомостей полотна
+            if temp_dict_adr is not None:
+                dict_bs_adr.update(temp_dict_adr)
+                dict_bs_azi.update(temp_dict_azi)
+                sheets_list_uploaded[row][BS_UNIQ] = len(temp_dict_adr)
+                sheets_list_uploaded[row][BS_ADR_FIND] = len(temp_dict_adr)
+                sheets_list_uploaded[row][TYPE_FOUND] = "Довідник БС"
+                sheets_list_uploaded[row][TAB_LOG] = str(sheets_list_uploaded[row][TAB_LOG]) \
+                                                     + '\nДо опрацювання файлів додано відомості про розміщення ' \
+                                                       'базових станцій зв\'язку у кількості - ' \
+                                                     + str(len(temp_dict_adr))
+                if errors != '':
+                    sheets_list_uploaded[row][TAB_LOG] = str(sheets_list_uploaded[row][TAB_LOG]) + str(errors)
+                bs_files.append(sheets_list_uploaded[row][FILE_PATH])
+        except Exception as ex:
+            print('exception')
+            print(ex)
+            sheets_list_uploaded[row][TAB_LOG] = str(sheets_list_uploaded[row][TAB_LOG]) + \
+                                            str('\nПомилка при спробі перевірити наявність словників базових станцій '
+                                                'зв\'язку, файл не використовується у формуванні відомостей про '
+                                                'розміщення БС')
+        print(sheets_list_uploaded[row])
+    counter_bs = 100
+    return main_data_frame, sheets_list_uploaded, separated_sims
 
 
-def files_preview():
-    # load a test frame:
-    print("\n" + Fore.LIGHTWHITE_EX + Back.LIGHTBLACK_EX + "Проверка файлов, загрузка тестовых фрагментов:"
-          + Style.RESET_ALL)
-    for i in tabs_list:
-        print('\t', i)
-    support_col_names = list(set(dict_columns.values()))
-    files_to_test = len(tabs_list)
-    global list_to_work
-    for file in tabs_list:
-        temp_frame = pd.DataFrame
-        print("\n" + Fore.MAGENTA + "Проверяю файл:", file, Style.RESET_ALL)
-        if file.endswith(".xlsx") | file.endswith(".xls"):
-            temp_frame = pd.read_excel(file, header=None, nrows=test_frame_deep, index_col=None)
-        elif file.endswith(".csv"):
-            temp_frame = pd.read_csv(file, header=None, nrows=test_frame_deep, index_col=None)
-        elif file.endswith(".txt"):
-            temp_frame = pd.read_table(file, header=None, nrows=test_frame_deep, index_col=None)
-        elif file.endswith(".xml"):
-            temp_frame = xml_parse_to_pandas(file)
-        else:
-            print(Fore.RED + "\tТип данных не опознан:", file)
-            print(Style.RESET_ALL)
-
-        # check: data shape for minimal requirements
-        if temp_frame.shape[1] > 4:
-            c = temp_frame.shape[1] - 1  # num of iterations (for all columns tabs)
-            print("\tОбнаружено столбцов:", c + 1)
-            a = np.array([])  # array for collecting positions of rows with keywords
-            b = dict_columns.keys()  # list of keywords from columns' voc (in human format)
-            while c >= 0:  # checking columns name in test dataframe
-                a = np.append(a, temp_frame.loc[temp_frame[c].isin(b)].index.values)
-                c = c - 1
-            a = a.tolist()  # convert np array to default list
-            a = list(a)
-            a_set = set(a)
-            most_common = None  # var for most frequency row (with columns' names)
-            qty_most_common = 0  # how much columns name detected in most common row
-            for item in a_set:  # voting for row with columns' names
-                qty = a.count(item)
+def search_bs_voc(file, weight):
+    print('started bsvoc func')
+    global counter_bs
+    bs_adr = {}
+    bs_azi = {}
+    errors = ''
+    columns_dict = {}
+    columns_dict.update(config_get_dict('columns_dict_adr_a'))
+    columns_dict.update(config_get_dict('columns_dict_az_a'))
+    columns_dict.update(config_get_dict('columns_dict_cid_a'))
+    columns_dict.update(config_get_dict('columns_dict_lac_a'))
+    # --------------------------В РОБОТІ ЧЕРНЕТКА
+    if file[FILE_PATH].endswith(".xls") or file[FILE_PATH].endswith(".xlsx"):
+        temp_frame = pd.read_excel(file[FILE_PATH], header=None, nrows=DEEP, index_col=None)
+        if temp_frame.shape[1] == 4:
+            col_iter = 3  # кількість ітерацій для перевірки 4 колонок
+            rows_occur = []  # список для накопичення номерів рядків в яких виявлено заголовки довідника
+            keywords = columns_dict.keys()  # список розпізнання
+            while col_iter >= 0:  # перебір колонок
+                # перевірка наявності записів з урахуванням нижнього регістру:
+                res_series = temp_frame[temp_frame[col_iter].str.lower().isin([x.lower() for x in keywords])]
+                # накопичення рядків у яких знайдено заголовки:
+                rows_occur = rows_occur + list(res_series.index.values)
+                col_iter = col_iter - 1  # підготовка до наступної ітерації
+            rows_set = set(rows_occur)
+            most_common = None
+            qty_most_common = 0
+            for item in rows_set:  # перебір унікальних номерів рядків
+                qty = rows_occur.count(item)
                 if qty > qty_most_common:
                     qty_most_common = qty
                     most_common = int(item)
+            del temp_frame
 
             if qty_most_common >= 4:
-                print('\tЗаголовки на строке: ', most_common + 1)
-                temp_frame.columns = temp_frame.iloc[most_common]  # set header
-                temp_frame.rename(columns=dict_columns, inplace=True)  # rename headers for sys names
-                temp_frame = temp_frame.iloc[most_common + 1:]  # drop rows before headers
-                col_list = list(temp_frame.columns)  # get a columns' list
+                bs_frame = pd.read_excel(file[FILE_PATH], header=most_common)
+                bs_frame.columns = bs_frame.columns.str.lower()
+                bs_frame.rename(columns=columns_dict, inplace=True)
+                col_list = list(bs_frame.columns)
+                if col_list.count('lac_a') == 1 and col_list.count('cid_a') == 1 and col_list.count(
+                        'az_a') == 1 and col_list.count('adr_a') == 1:
+                    # 'to_numeric' shows Nan values (rows with bad data values)
+                    bs_frame['az_a'] = pd.to_numeric(bs_frame['az_a'], downcast='unsigned', errors='coerce')
+                    bs_frame['lac_a'] = pd.to_numeric(bs_frame['lac_a'], downcast='unsigned', errors='coerce')
+                    bs_frame['cid_a'] = pd.to_numeric(bs_frame['cid_a'], downcast='unsigned', errors='coerce')
 
-                # check for minimal combination of columns and go on preview:
-                if (col_list.count('type') > 0 and col_list.count('sim_a') > 0 and col_list.count('date') > 0) or \
-                        (col_list.count('type') > 0 and col_list.count('sim_a') > 0 and col_list.count(
-                            'date_time') > 0):
+                    # kill rows without LAC or/both CID data
+                    bs_frame = bs_frame.dropna(subset=['lac_a', 'cid_a'])
 
-                    found_columns = list(set(col_list) & set(support_col_names))
-                    print('\tРаспознано полей: ', len(found_columns), ' из ', temp_frame.shape[1])
+                    # convert to integer LAC and CID values
+                    bs_frame[['lac_a']] = bs_frame[['lac_a']].apply(np.uint32)
+                    bs_frame[['cid_a']] = bs_frame[['cid_a']].apply(np.uint32)
 
-                    # *****************CHECK TYPE BLOCK*******************
-                    # set status vars to default:
-                    ks_voc_status = False
-                    life_col_status = False
-                    abon_b_adr_status = False
-                    type_tab_status = 'heap'
-                    # check 'Life' type tab:
-                    if col_list.count('sim_c') > 0:
-                        life_col_status = True
-                        type_tab_status = 'A'
-                    # check for missing antenna information:
-                    if col_list.count('adr_a') == 0 and col_list.count('adr_az') == 0:
-                        ks_voc_status = True
-                    # check for 'A' type signs
-                    if len(temp_frame["sim_a"].unique()) == 1:
-                        type_tab_status = 'A'
-                    # check for 'B' type signs
-                    if col_list.count('sim_b') == 1:
-                        if len(temp_frame["sim_b"].unique()) == 1:
-                            type_tab_status = 'B'
-                    # checking information about the location of subscriber B
-                    if col_list.count('adr_b') == 1:
-                        if len(temp_frame["adr_b"].unique()) > 3:
-                            abon_b_adr_status = True
-                    # print('\tФайл похож на детализацию соединений мобильных терминалов ')
-                    print("\tОпределен тип детализации: ", type_tab_status)
-
-                    # adding a task to the scheduler:
-                    global list_to_work
-                    list_to_work.append([file, type_tab_status, abon_b_adr_status, life_col_status,
-                                         ks_voc_status, most_common])
-                    global tabs_to_work
-                    tabs_to_work = tabs_to_work + 1
-
-                    print('\tНаличие информации о местонахождении абонента "Б": ', dict_print.get(abon_b_adr_status))
-                    print('\tТройная запись абонентов (формат "Астелит"):       ', dict_print.get(life_col_status))
-                    print('\tНеобходимость подключеня внешних справочников БС:  ', dict_print.get(ks_voc_status))
-
-                    # checking supported connection types:
-                    used_types = temp_frame['type'].unique().tolist()
-                    support_types = dict_types.keys()
-                    new_types = list(set(used_types) - set(support_types))
-
-                    if len(new_types) > 0:
-                        print(Fore.RED + "\t\tВ тестовом фрагменте найдены незвестные типы соединений:")
-                        for item in new_types:
-                            print('\t\t', item)
-                        print(Style.RESET_ALL)
-                    # show unknown columns' names:
-                    if len(found_columns) < len(col_list):
-                        print(Fore.RED + "\t\tВ тестовом фрагменте найдены неизвестные заголовки столбцов:\n\t\t",
-                              list(set(temp_frame.columns) - set(support_col_names)))
-                        print(Style.RESET_ALL)
+                    bs_frame['az_a'].replace([None], [999], inplace=True)  # empty azimuth data to '999'
+                    bs_frame[['az_a']] = bs_frame[['az_a']].apply(np.uint32)  # set integer type
+                    bs_frame['lac_cid'] = bs_frame['lac_a'].astype(str) + '-' + bs_frame['cid_a'].astype(str)
+                    bs_adr.update(tuple(zip(bs_frame['lac_cid'], bs_frame['adr_a'])))
+                    bs_azi.update(tuple(zip(bs_frame['lac_cid'], bs_frame['az_a'])))
+                    errors = errors + str('\n') + str(bs_frame.iloc[[0, 1, 2, 3, 4], [0, 1, 2, 3]])
+                    print(bs_frame.iloc[[0, 1, 2, 3, 4], [0, 1, 2, 3]])
                 else:
-                    print(Fore.RED + "\tНедостаточно столбцов для анализа (минимально необходимы: "
-                                     "тип, абонент А, дата и время)")
-                    print('\t', list(set(temp_frame.columns) - set(support_col_names)))
-                    print(Style.RESET_ALL)
+                    bs_adr = None
+                    bs_azi = None
+                    errors = ''
             else:
-                print(Fore.RED + "\tСлишком мало полей для дальнейшей работы. Проверь исходный файл")
-                print(Style.RESET_ALL)
+                bs_adr = None
+                bs_azi = None
+                errors = ''
+        else:
+            bs_adr = None
+            bs_azi = None
+            errors = ''
 
-    files_accept = len(list_to_work)
-    print('\n' + Fore.LIGHTWHITE_EX + Back.LIGHTBLACK_EX + '************************РЕЗУЛЬТАТЫ ПРОВЕРКИ'
-                                                           '************************')
-    print("\tПроверено файлов:    " + Style.RESET_ALL, files_to_test)
-    print(Fore.LIGHTWHITE_EX + Back.LIGHTBLACK_EX + "\tДопущено к перегону: " + Style.RESET_ALL, files_accept)
-    print(Fore.LIGHTWHITE_EX + Back.LIGHTBLACK_EX + '***********************************'
-                                                    '********************************')
-    print(Style.RESET_ALL)
-    if files_accept == 0:
-        print(Fore.RED + 'Нет файлов для анализа. Программа остановлена.' + Style.RESET_ALL)
-        time.sleep(5)
-        os.abort()
+    # --------------------------ЗАВЕРШЕННЯ ЧЕРНЕТКИ
+    counter_bs += weight
+    return bs_adr, bs_azi, errors
 
-
-def scan_bs_voc():
-    print("\n" + Fore.LIGHTWHITE_EX + Back.LIGHTBLACK_EX + "Поиск справочников БС Киевстар...")
-    print(Style.RESET_ALL)
-    for file in tabs_list:  # checking files for files with 4 columns
-        if file.endswith(".xls") or file.endswith(".xlsx"):
-            temp_frame = pd.read_excel(file, header=None, nrows=test_frame_deep, index_col=None)
-
-            if temp_frame.shape[1] == 4:
-                c = 3  # num of iterations (for 4 columns tabs)
-                a = np.array([])  # array for collecting num of rows with keywords
-                b = dict_bs.keys()  # keywords for BS voc (in human format)
-                while c >= 0:  # checking columns name in test dataframe
-                    a = np.append(a, temp_frame.loc[temp_frame[c].isin(b)].index.values)
-                    c = c - 1
-                a = a.tolist()
-                a_set = set(a)
-                a = list(a)
-                most_common = None
-                qty_most_common = 0
-                for item in a_set:  # voting for row with columns' names
-                    qty = a.count(item)
-                    if qty > qty_most_common:
-                        qty_most_common = qty
-                        most_common = int(item)
-
-                if qty_most_common >= 4:
-                    print(Fore.GREEN + '\tОбнаружен файл похожий на справочник Киевстар - ', file,
-                          '\n\tЗаголовки на строке №', most_common + 1, Style.RESET_ALL)
-                    bs_frame = pd.read_excel(file, header=most_common)
-                    bs_frame.rename(columns=dict_bs, inplace=True)
-                    col_list = list(bs_frame.columns)
-                    if col_list.count('LAC') == 1 and col_list.count('CID') == 1 and col_list.count(
-                            'azimuth') == 1 and col_list.count('address') == 1:
-                        print('\tФайл содержит записи о базовых станциях... Готовлю данные для работы...')
-
-                        # 'to_numeric' shows Nan values (rows with bad data values)
-                        bs_frame['azimuth'] = pd.to_numeric(bs_frame['azimuth'], downcast='unsigned', errors='coerce')
-                        bs_frame['LAC'] = pd.to_numeric(bs_frame['LAC'], downcast='unsigned', errors='coerce')
-                        bs_frame['CID'] = pd.to_numeric(bs_frame['CID'], downcast='unsigned', errors='coerce')
-
-                        # kill rows without LAC or/both CID data
-                        bs_frame = bs_frame.dropna(subset=['LAC', 'CID'])
-
-                        # convert to integer LAC and CID values
-                        bs_frame[['LAC']] = bs_frame[['LAC']].apply(np.uint32)
-                        bs_frame[['CID']] = bs_frame[['CID']].apply(np.uint32)
-
-                        bs_frame['azimuth'].replace([None], [999], inplace=True)  # empty azimuth data to '999'
-                        bs_frame[['azimuth']] = bs_frame[['azimuth']].apply(np.uint32)  # set integer type
-                        bs_frame['LACCID_key'] = bs_frame['LAC'].astype(str) + '-' + bs_frame['CID'].astype(str)
-                        print("\tДанные о базовых станциях Киевстар:", bs_frame.shape[0], ' Добавляю в память.')
-                        dict_address_bs.update(tuple(zip(bs_frame['LACCID_key'], bs_frame['address'])))
-                        dict_azimuth.update(tuple(zip(bs_frame['LACCID_key'], bs_frame['azimuth'])))
-                        print('\tОбразец данных:\n', Fore.LIGHTYELLOW_EX, bs_frame.iloc[[0, 1, 2, 3, 4], [0, 1, 2, 3]])
-                        print(Style.RESET_ALL)
-                        tabs_list.remove(file)
-
-                    else:
-                        print('\t', file, Fore.RED + '-формат не соответствует справочнику Киевстар, '
-                                                     'отстутствуют необходимые столбцы')
-                        print(Style.RESET_ALL)
-                else:
-                    print('\nПри проверке файла: "', file, '" обнаружены признаки справочника БС. \n\tПодписи колонок '
-                                                           'не распознаны, проверьте заголовки' + Style.RESET_ALL)
-            else:
-                pass
-                # print("\tСправочники базовых станций не обнаружены.")
 
 
 def burning():

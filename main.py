@@ -1,69 +1,48 @@
 import sys
+# from temp.fake import fake_func
+
 from gui.gui import *
 from gui.gui_settings import Ui_Form
 from gui.gui_splash import Ui_SplashScreen
+from gui.gui_converting import Ui_LoadingConverter
 from gui.gui_import_folder import *
 
+from PyQt5.QtCore import Qt, pyqtSignal, QObject
 
+import qtmodern.styles
+import qtmodern.windows
 
 from config.config_math import config_get_value, config_set_item, config_save, config_load, config_swipe, \
     config_get_options, config_remove_item, config_get_dict
 
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QThread, QEvent
-from PyQt5.Qt import QProxyStyle, QStyle
-from PyQt5.QtWidgets import QStyleFactory
+
+
 
 
 import colorama
 from converter.convert_engine import *
 from converter.terminal_messages import *
 from analyst.analyst_engine import analysis_type_a
-from tqdm import tqdm
 
-import qtmodern.styles
-import qtmodern.windows
+
 
 current_version = 'ver.1.1 build070321(unstable)'
-counter = 0
+counter = 0  # рахунок заповнення статус бару ВІКНА ЗАВАНТАЖЕННЯ
 prog_execute_stage = 0  # етапи програми для відображення активності елементів (до перегону, після перегону), глобальна
 supported_types = ('.xls', '.xlsx', '.xml', '.txt', '.csv', '.txt', '.dec')
 
-# Змінна списку файлів, обраних користувачем для опрацювання, з їх властивостями:
-# (містить список списків для подальшої роботи з конвертування таблиць, їх розпізнання та експорту -
-# 0) повний шлях з найменуванням файлу
-# 1) найменування файлу з розширенням
-# 2) розмір файлу у строковому форматі "{%d} Kb"
-# 3) "відбиток" файлу, що являє строку "{найменування з розширенням[1]} + " " + {розмір[2]}" для перевірки повторного
-# додавання файлу до списку (наприклад дублікат файлу з іншої директорії)
 
-# Наступні елементи списку додаються за результатами опрацювання файлів:
-# 4) кількість виявлених записів, що будуть включені до експорту
-# 5) розпізнано колонок
-# 6) виявлено колонок
-# 7) потрійний запис абонентів (необхідність визначення дійсного абонента Б)
-# 8) необхідність підключення зовнішній довідників БС (відсутність розшифрування адрес БС)
-# 9) необхідність розділення АБ (АБ тип - наявні відомості про ІМЕІ та/або місцезнаходження Б)
-# 10) розпізнано типів
-# 11) виявлено типів
-# 12) абонентів А унікальних у файлі
-# 13) абонентів Б унікальних у файлі
-# 14) ІМЕІ А унікальних у файлі
-# 15) ІМЕІ Б унікальних у файлі (для АБ деталізацій, в інших випадках - 0)
-# 16) унікальних територіальних зон LAC
-# 17) унікальних базових станцій LAC+Cid
-# 18) унікальних базових станцій LAC+Cid, які мають розшифрування адреси БС (для КС після опрацювання довідником)
-# 19) лог опрацювання файлу для відображення у вікні результатів
-availible_sheets_list = []
+availible_sheets_list = []  # список файлів для конвертування та результати опрацювання (детально в tasks.py)
+main_app_df = pd.DataFrame()  # конвертовані дані з усіх файлів (для подальшого експорту або аналізу)
+subscriber_a_list = []  # список всіх знайдених цільових абонентів (основні абоненти у файлі)
+subscriber_b_list = []  # список всіх цільових абонентів по яким є вибірка типу "Б"
+subscriber_ab_list = []  # список абонентів щодо яких у одному файлі є відомості про місцезнаходження і співрозмовника
 
-
-
-# Заголовки колонок відображення обраних до опрацювання файлів (для використання у моделі даних Qt):
-input_files_default_headers_set = ['Шлях', 'Файл', 'Розмір', 'Відбиток', 'Записів', 'Колонок', 'Типів',
-                                   'Абонентів А/Б', 'IMEI', 'Зон/антен', 'Визначений тип']
 
 # Консольні функції (підлягають видаленню після переходу на GUI)
-colorama.init()
-print_logo()
+colorama.init()  # ініціалізація модулю виводу у консоль різними кольорами
+print_logo()  # друк логотипу під час старту програми
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------ХЕНДЛЕР ПОДІЙ---------------------------------------------------------
@@ -71,21 +50,30 @@ print_logo()
 class HandlerFirst(QObject):
     signal_update_statusbar = pyqtSignal(str)
     signal_settings_changed = pyqtSignal()
-
+    signal_converter_pb = pyqtSignal(list)
 
 # ---------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------МОДЕЛЬ ТАБЛИЦІ КОНВЕРТЕРУ---------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------
 class ModelSheetsListView(QtCore.QAbstractTableModel):
-    def __init__(self, parent, columns_headers, input_data):
+    def __init__(self, parent, input_data):
         QtCore.QAbstractTableModel.__init__(self)
         self.gui = parent
+        self.input_files_default_headers_set = ['Файл', 'Розмір', 'Записи', 'Колонки', 'Типи', 'SIM\nА/Б',
+                                           'ІМЕІ\nА/Б', 'LAC', 'БС/Адрес', 'Визначений тип']
+
         for row in input_data:  # додавання порожніх клітинок для уникнення помилки IndexError при відображенні
-            if len(row) < len(columns_headers):
-                while len(row) < len(columns_headers):
+            if len(row) < len(self.input_files_default_headers_set):
+                while len(row) < len(self.input_files_default_headers_set):
                     row.append("-")
-        self.colLabels = columns_headers
-        self.cached = input_data
+        self.colLabels = self.input_files_default_headers_set
+        self.converted_data = []
+        for row in input_data:
+            new_row = [row[1], row[2], str(row[4])+'/'+str(row[5]), str(row[6])+'/'+str(row[7]), str(row[8])+
+                       '/'+str(row[9]), str(row[10])+'/'+str(row[11]), str(row[12])+'/'+str(row[13]), row[14],
+                       str(row[15])+'/'+str(row[16]), row[20]]
+            self.converted_data.append(new_row)
+        self.cached = self.converted_data
 
     def rowCount(self, parent):
         return len(self.cached)
@@ -96,6 +84,10 @@ class ModelSheetsListView(QtCore.QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return QtCore.QVariant()
+        elif (index.column() == 1 and role == QtCore.Qt.TextAlignmentRole):
+            return QtCore.Qt.AlignRight
+        elif (index.column() in [2, 3, 4, 5, 6, 7, 8] and role == QtCore.Qt.TextAlignmentRole):
+            return QtCore.Qt.AlignCenter
         elif role != QtCore.Qt.DisplayRole and role != QtCore.Qt.EditRole:
             return QtCore.QVariant()
         value = ''
@@ -122,6 +114,7 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         self.ui.statusbar.showMessage('Програму завантажено', 5000)
 
         self.win_settings = SettingsWindow()
+        self.win_loading = LoadingScreen()
         #
 
         # ---------------------------------Початкова активність елементів(віджетів):-----------------------------------
@@ -137,9 +130,13 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         # Підготовка форми таблиці для файлів обраних користувачем (для правильного відображення у віджеті
         # tableView необхідно підготувати форму даних за допомогою класу QAbstractTableModel):
         self.widget_sheets_table_view = self.ui.tableView_import_files_list  # змінна безпосередньо віджету
-        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view, input_files_default_headers_set,
+        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view,
                                                       availible_sheets_list)  # об'єкт моделі даних
         self.widget_sheets_table_view.setModel(self.sheets_view_object)  # застосування моделі до віджету
+        for col in range(2, 9, 1):
+            self.widget_sheets_table_view.setColumnWidth(col, 55)
+        self.widget_sheets_table_view.resizeColumnToContents(0)
+        self.widget_sheets_table_view.resizeColumnToContents(1)
         # мінімізація висоти рядків:
         tv_vertical_header_setting = self.widget_sheets_table_view.verticalHeader()
         tv_vertical_header_setting.setDefaultSectionSize(10)
@@ -165,6 +162,8 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         self.ui.btn_sheet_import_def_dir.clicked.connect(self.add_sheet_folder_default)
         # Сигнал оновлення статусбару:
         self.win_settings.signal.signal_update_statusbar.connect(self.print_statusbar)
+        # Підключення кнопки СТАРТУ КОНВЕРТУВАННЯ:
+        self.ui.btn_sheet_start_convert.clicked.connect(self.start_converting)
         #
 
     # -----------------------------------------методи ВІДКРИТТЯ ВІКОН --------------------------------------------------
@@ -179,6 +178,16 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         mw.setWindowFlags(flags)
         mw.show()
 
+    def start_converting(self):
+        global counter_bs
+        global counter_files
+        self.win_loading.show()
+        convert_all(availible_sheets_list)
+
+
+
+
+
     def print_statusbar(self, text):
         self.ui.statusbar.showMessage(str(text), 5000)
 
@@ -189,6 +198,12 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         else:
             self.ui.btn_sheet_remove.setEnabled(False)
 
+    def upd_btn_converter_start(self):
+        if len(availible_sheets_list) > 0:
+            self.ui.btn_sheet_start_convert.setEnabled(True)
+        else:
+            self.ui.btn_sheet_start_convert.setDisabled(True)
+
     def remove_sheet_from_list(self):  # видалення інформації з таблиці обраних файлів (тільки до перегону)
         global availible_sheets_list
         if prog_execute_stage == 0 and self.widget_sheets_table_view.selectionModel().hasSelection():
@@ -198,12 +213,16 @@ class MainWinMatematik(QtWidgets.QMainWindow):
                 availible_sheets_list.pop(number_to_remove)
                 self.update_sheets_list()
                 self.ui.btn_sheet_remove.setEnabled(False)
+        self.upd_btn_converter_start()
 
     def update_sheets_list(self):  # оновлення таблиці для відображення (коли змінюється availible_sheets_list)
         self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view,
-                                                      input_files_default_headers_set, availible_sheets_list)
+                                                      availible_sheets_list)
         self.widget_sheets_table_view.setModel(self.sheets_view_object)
+        self.widget_sheets_table_view.resizeColumnToContents(0)
+        self.widget_sheets_table_view.resizeColumnToContents(1)
         self.widget_sheets_table_view.update()
+        self.upd_btn_converter_start()
         # self.widget_sheets_table_view.resizeColumnToContents(1)
         # self.widget_sheets_table_view.resizeColumnToContents(0)
         # self.widget_sheets_table_view.resizeColumnToContents(2)
@@ -227,20 +246,21 @@ class MainWinMatematik(QtWidgets.QMainWindow):
             if file_footprint in [results[3] for results in incoming_sheets_list]:
                 pass
             else:
-                incoming_sheets_list.append([file_path, file_name, file_size, file_footprint])
+                incoming_sheets_list.append([file_path, file_name, file_size, file_footprint, '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'])
         availible_sheets_list = incoming_sheets_list
         print(incoming_sheets_list)
         self.update_sheets_list()
+        self.upd_btn_converter_start()
         # У вкладений список sheets_list_prepared додаємо файли, які обрав користувач, та яких ще немає у списку,
         # перевірка на повторення через file_footprint (назва файлу з його розміром)
 
     def clear_sheets_list(self):
         global availible_sheets_list
         availible_sheets_list = []
-        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view, input_files_default_headers_set,
-                                                      availible_sheets_list)
+        self.sheets_view_object = ModelSheetsListView(self.widget_sheets_table_view, availible_sheets_list)
         self.widget_sheets_table_view.setModel(self.sheets_view_object)
         self.ui.btn_sheet_remove.setEnabled(False)
+        self.upd_btn_converter_start()
 
     def add_sheet_folder_default(self):
         global availible_sheets_list
@@ -262,10 +282,11 @@ class MainWinMatematik(QtWidgets.QMainWindow):
                 if file_footprint in [results[3] for results in new_sheets_list]:
                     pass
                 else:
-                    new_sheets_list.append([file_path, file, file_size, file_footprint])
+                    new_sheets_list.append([file_path, file, file_size, file_footprint, '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'])
             availible_sheets_list = new_sheets_list
             print(new_sheets_list)
             self.update_sheets_list()
+        self.upd_btn_converter_start()
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -882,7 +903,7 @@ class SplashScreen(QtWidgets.QMainWindow):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect(self)
-        self.shadow.setBlurRadius(20)
+        self.shadow.setBlurRadius(30)
         self.shadow.setXOffset(0)
         self.shadow.setYOffset(0)
         self.shadow.setColor(QtGui.QColor(0, 0, 0, 60))
@@ -890,7 +911,7 @@ class SplashScreen(QtWidgets.QMainWindow):
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.progress)
-        self.timer.start(25)
+        self.timer.start(10)
 
         self.show()
 
@@ -906,6 +927,52 @@ class SplashScreen(QtWidgets.QMainWindow):
             # sys.exit(app.exec_())
             self.close()
         counter +=1
+
+# -----------------------------------------------------------------------------------------------------------------
+# -------------------------------------------ВІКНО РОБОТИ КОНВЕРТЕРУ-----------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------
+class LoadingScreen(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        QtWidgets.QWidget.__init__(self)
+        self.ui = Ui_LoadingConverter()
+        self.ui.setupUi(self)
+        self.setWindowModality(2)
+
+        # self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        #
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect(self)
+        self.shadow.setBlurRadius(45)
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 90))
+        self.ui.frame.setGraphicsEffect(self.shadow)
+        self.setWindowTitle('Опрацювання')
+
+        self.thread = ThreadClass()
+        self.thread.start()
+
+        self.thread.progress_upd.connect(self.upd_all_progressbars)
+
+    def upd_all_progressbars(self, val):
+        self.ui.pb_voc.setValue(val[0])
+        self.ui.pb_splash.setValue(val[1])
+
+
+class ThreadClass(QtCore.QThread):
+    progress_upd = pyqtSignal(list)
+
+    def __init__(self, parent=None):
+        super(ThreadClass, self).__init__(parent)
+
+    def run(self):
+        global counter_bs
+        global counter_files
+        while 1:
+            val = [counter_bs, counter_files]
+            self.progress_upd.emit(val)
+            time.sleep(3)
+
 
 # -----------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------ВИКОНАННЯ ПРОГРАМИ------------------------------------------------

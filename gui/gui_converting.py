@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'win_splash.ui'
+# Form implementation generated from reading ui file 'win_converter_loading.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -11,11 +11,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_SplashScreen(object):
-    def setupUi(self, SplashScreen):
-        SplashScreen.setObjectName("SplashScreen")
-        SplashScreen.resize(350, 235)
-        self.centralwidget = QtWidgets.QWidget(SplashScreen)
+class Ui_LoadingConverter(object):
+    def setupUi(self, LoadingConverter):
+        LoadingConverter.setObjectName("LoadingConverter")
+        LoadingConverter.resize(350, 235)
+        self.centralwidget = QtWidgets.QWidget(LoadingConverter)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -23,31 +23,20 @@ class Ui_SplashScreen(object):
         self.frame.setStyleSheet("QFrame{\n"
 "    background-color: rgb(70, 70, 70);\n"
 "    color: rgb(220, 220, 220);\n"
-"    border-radius: 9px\n"
+"    border-radius: 9px;\n"
+"    border-color: rgb(40, 40, 40)\n"
 "\n"
 "}")
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.frame)
-        self.verticalLayout_2.setContentsMargins(12, 21, 12, 2)
-        self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.logo_splash = QtWidgets.QLabel(self.frame)
-        self.logo_splash.setMinimumSize(QtCore.QSize(87, 90))
-        self.logo_splash.setMaximumSize(QtCore.QSize(87, 90))
-        self.logo_splash.setFrameShape(QtWidgets.QFrame.Box)
-        self.logo_splash.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.logo_splash.setText("")
-        self.logo_splash.setPixmap(QtGui.QPixmap(":/pics/gui_res/math_logo opas.png"))
-        self.logo_splash.setScaledContents(True)
-        self.logo_splash.setAlignment(QtCore.Qt.AlignCenter)
-        self.logo_splash.setWordWrap(False)
-        self.logo_splash.setObjectName("logo_splash")
-        self.horizontalLayout.addWidget(self.logo_splash)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem)
         self.lbl_prog_name = QtWidgets.QLabel(self.frame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -61,13 +50,45 @@ class Ui_SplashScreen(object):
         self.lbl_prog_name.setObjectName("lbl_prog_name")
         self.verticalLayout_2.addWidget(self.lbl_prog_name)
         self.lbl_current_ver = QtWidgets.QLabel(self.frame)
-        self.lbl_current_ver.setStyleSheet("font: 57 8pt \"Uni Neue Regular\";\n"
+        self.lbl_current_ver.setStyleSheet("font: 57 9pt \"Uni Neue Regular\";\n"
 "color: rgb(192, 199, 212)")
         self.lbl_current_ver.setAlignment(QtCore.Qt.AlignCenter)
         self.lbl_current_ver.setObjectName("lbl_current_ver")
         self.verticalLayout_2.addWidget(self.lbl_current_ver)
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_2.addItem(spacerItem)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem1)
+        self.pb_voc = QtWidgets.QProgressBar(self.frame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pb_voc.sizePolicy().hasHeightForWidth())
+        self.pb_voc.setSizePolicy(sizePolicy)
+        self.pb_voc.setMaximumSize(QtCore.QSize(16777215, 14))
+        self.pb_voc.setStyleSheet("QProgressBar{\n"
+"    \n"
+"    background-color: rgb(136, 136, 136);\n"
+"    border-radius: 7px;\n"
+"    border-style: None;\n"
+"    text-align: center;\n"
+"    color: rgb(192, 199, 212);\n"
+"    \n"
+"    font: 57 8pt \"Uni Neue Regular\";\n"
+"\n"
+"    }\n"
+"QProgressBar::chunk{\n"
+"    border-radius: 7px;\n"
+"    background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0.789, stop:0 rgba(42, 130, 216, 255), stop:1 rgba(102, 184, 232, 255))\n"
+"}")
+        self.pb_voc.setProperty("value", 0)
+        self.pb_voc.setObjectName("pb_voc")
+        self.verticalLayout_2.addWidget(self.pb_voc)
+        self.lbl_text_loading_2 = QtWidgets.QLabel(self.frame)
+        self.lbl_text_loading_2.setStyleSheet("color:  rgb(192, 199, 212);\n"
+"font: 57 9pt \"Uni Neue Regular\";\n"
+" ")
+        self.lbl_text_loading_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.lbl_text_loading_2.setObjectName("lbl_text_loading_2")
+        self.verticalLayout_2.addWidget(self.lbl_text_loading_2)
         self.pb_splash = QtWidgets.QProgressBar(self.frame)
         self.pb_splash.setMaximumSize(QtCore.QSize(16777215, 14))
         self.pb_splash.setStyleSheet("QProgressBar{\n"
@@ -85,26 +106,27 @@ class Ui_SplashScreen(object):
 "    border-radius: 7px;\n"
 "    background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0.789, stop:0 rgba(42, 130, 216, 255), stop:1 rgba(102, 184, 232, 255))\n"
 "}")
-        self.pb_splash.setProperty("value", 24)
+        self.pb_splash.setProperty("value", 0)
         self.pb_splash.setObjectName("pb_splash")
         self.verticalLayout_2.addWidget(self.pb_splash)
         self.lbl_text_loading = QtWidgets.QLabel(self.frame)
         self.lbl_text_loading.setStyleSheet("color:  rgb(192, 199, 212);\n"
-"font: 57 8pt \"Uni Neue Regular\";\n"
+"font: 57 9pt \"Uni Neue Regular\";\n"
 " ")
         self.lbl_text_loading.setAlignment(QtCore.Qt.AlignCenter)
         self.lbl_text_loading.setObjectName("lbl_text_loading")
         self.verticalLayout_2.addWidget(self.lbl_text_loading)
         self.verticalLayout.addWidget(self.frame)
-        SplashScreen.setCentralWidget(self.centralwidget)
+        LoadingConverter.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(SplashScreen)
-        QtCore.QMetaObject.connectSlotsByName(SplashScreen)
+        self.retranslateUi(LoadingConverter)
+        QtCore.QMetaObject.connectSlotsByName(LoadingConverter)
 
-    def retranslateUi(self, SplashScreen):
+    def retranslateUi(self, LoadingConverter):
         _translate = QtCore.QCoreApplication.translate
-        SplashScreen.setWindowTitle(_translate("SplashScreen", "MainWindow"))
-        self.lbl_prog_name.setText(_translate("SplashScreen", "<html><head/><body><p><span style=\" font-size:16pt; font-weight:600;\">математик</span></p></body></html>"))
-        self.lbl_current_ver.setText(_translate("SplashScreen", "ver.1.1 build070321(unstable)"))
-        self.lbl_text_loading.setText(_translate("SplashScreen", "Loading..."))
+        LoadingConverter.setWindowTitle(_translate("LoadingConverter", "MainWindow"))
+        self.lbl_prog_name.setText(_translate("LoadingConverter", "<html><head/><body><p><span style=\" font-size:16pt; font-weight:600;\">конвертер</span></p></body></html>"))
+        self.lbl_current_ver.setText(_translate("LoadingConverter", "розпочато опрацювання таблиць..."))
+        self.lbl_text_loading_2.setText(_translate("LoadingConverter", "Пошук довідників БС..."))
+        self.lbl_text_loading.setText(_translate("LoadingConverter", "Конвертування файлів..."))
 import gui.res_file
