@@ -169,3 +169,13 @@ def choice_sim_b(row):
         return d
     else:
         return c
+
+
+def choice_sim_b_forw(row):
+    type = row['type']
+    forw = row['forw']
+    sim = row['sim_b']
+    if str(type) == 'message_out':
+        return forw
+    else:
+        return sim

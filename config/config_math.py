@@ -48,7 +48,6 @@ def config_get_dict(section):
         working_dict.update(link)
     return working_dict
 
-
 current_config = ConfigParser()  # об'єкт конфігурації, яка використовується під час роботи
 config_file_loaded_status = current_config.read('config\\config.ini') # завантаження користувацьких налаштувань
 if config_file_loaded_status == []: # перевірка наявності файлу конфігу, відновлення у разі відсутності

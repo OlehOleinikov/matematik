@@ -19,12 +19,17 @@ default_config['types_con_main_display_names'] = {
     'unknown': 'переад'
     }
 
+# підпис для типів, що не розпізнані
+default_config['unknown'] = {
+    'unknown': 'unknown'
+    }
+
 # підписи колонок у результуючому файлі:
 default_config['columns_export_names'] = {
     'type': 'Тип',
     'date': 'Дата',
     'time': 'Час',
-    'dur': 'Трив.',
+    'dur_str': 'Трив.',
     'sim_a': 'Абонент А',
     'imei_a': 'ІМЕІ А',
     'sim_b': 'Абонент Б',
@@ -38,6 +43,37 @@ default_config['columns_export_names'] = {
     'az_b': 'Аз.Б',
     'adr_b': 'Адреса Б'
     }
+
+default_config['columns_export_names_only_a'] = {
+    'type': 'Тип',
+    'date': 'Дата',
+    'time': 'Час',
+    'dur_str': 'Трив.',
+    'sim_a': 'Абонент А',
+    'imei_a': 'ІМЕІ А',
+    'sim_b': 'Абонент Б',
+    'lac_a': 'LAC A',
+    'cid_a': 'Cid A',
+    'az_a': 'Аз.А',
+    'adr_a': 'Адреса А',
+    }
+
+# список для формування структури головного фрейму (попередньо треба створити назви колонок для прийому з функції):
+default_config['main_frame_columns_set'] = {
+    'type': 'Тип',
+    'date': 'Дата',
+    'time': 'Час',
+    'date_time': 'Форматована дата/час pandas (для розрахунків)',
+    'dur': 'Тривалість - форматована pandas (для розрахунків)',
+    'dur_str': 'Тривалість - текстовий рядок (для відображення)',
+    'sim_a': 'Абонент А',
+    'imei_a': 'ІМЕІ А',
+    'sim_b': 'Абонент Б',
+    'lac_a': 'LAC A',
+    'cid_a': 'Cid A',
+    'az_a': 'Аз.А',
+    'adr_a': 'Адреса А'
+}
 
 # види колонок, які можуть бути в імпортованому файлі та їх підписи в інтерфейсі GUI:
 default_config['columns_incoming_names'] = {
