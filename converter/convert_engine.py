@@ -22,7 +22,7 @@ COLUMNS_CONVERTED = 7
 TYPES_DETECTED = 8
 TYPES_CONVERTED = 9
 SIMA_UNIQ = 10
-SIMB_UNOQ = 11
+SIMB_UNIQ = 11
 IMEIA_UNIQ = 12
 IMEIB_UNIQ = 13
 LAC_UNIQ = 14
@@ -277,7 +277,7 @@ def convert_all(files_sheet: list):
     main_data_frame.sort_values(by=['date_time'], inplace=True)
     counter_files = 100
     print(sheets_list_uploaded)
-    return main_data_frame, sheets_list_uploaded, separated_sims
+    return main_data_frame, sheets_list_uploaded
 
 
 def search_bs_voc(file):
@@ -377,7 +377,7 @@ def burning(info_row, dict_address_bs, dict_azimuth):
     # Завантаження датафрейму файлу
     try:
         if info_row[FILE_PATH].endswith(".xlsx") | info_row[FILE_PATH].endswith(".xls"):
-            full_frame = pd.read_excel(info_row[FILE_PATH], header=None, nrows=DEEP, index_col=None)
+            full_frame = pd.read_excel(info_row[FILE_PATH], header=None, index_col=None)
             temp_frame = full_frame.iloc[:15]
         elif info_row[FILE_PATH].endswith(".xml"):
             full_frame = xml_parse_to_pandas(info_row[FILE_PATH])
@@ -405,14 +405,16 @@ def burning(info_row, dict_address_bs, dict_azimuth):
     new_row[COLUMNS_CONVERTED] = headers_located
 
     # Перейменування заголовків для аналізу:
-    full_frame.columns = full_frame.iloc[header_row]  # встановлення заголовку первинного
-    full_frame = full_frame.iloc[header_row + 1:]  # відмежування (видалення) записів до заголовку
+    start_columns_names_list = full_frame.iloc[header_row]  # встановлення заголовку первинного
+    full_frame = full_frame[header_row+1:]
+    full_frame = full_frame.rename(columns=start_columns_names_list)  # відмежування (видалення) записів до заголовку
     full_frame.columns = full_frame.columns.str.lower()  # для співставлення зі словником (ключі ловеркейс)
     full_frame.rename(columns=dict_columns, inplace=True)  # застосування словника для перейменування
-    col_list = list(temp_frame.columns)  # список заголовків для подальшої перевірки наявності окремих
+    col_list = full_frame.columns.tolist()  # список заголовків для подальшої перевірки наявності окремих
     unknown_columns_list = list(set(col_list) - set(service_col_names))
+    print(unknown_columns_list)
     if len(unknown_columns_list) > 0:
-        new_row[TAB_LOG] = add_log_text(new_row[TAB_LOG], list_to_sring(unknown_columns_list))
+        new_row[TAB_LOG] = add_log_text(new_row[TAB_LOG], str('Нерозпізнані колонки: ') + list_to_sring(unknown_columns_list))
 
     # Перевірка на достатність колонок для подальшої роботи:
     if not (col_list.count('type') > 0
@@ -454,6 +456,7 @@ def burning(info_row, dict_address_bs, dict_azimuth):
 
     # --------------------------------------------convert TYPE:
     current_action = 'Конвертування типів з\'єднань...'
+    print('converting types...')
     rows_before = full_frame.shape[0]
     full_frame['type'] = full_frame['type'].str.lower()
     used_types = full_frame['type'].unique().tolist()
@@ -498,6 +501,8 @@ def burning(info_row, dict_address_bs, dict_azimuth):
     # ------------------------------------------convert SIM A:
     current_action = 'Форматування записів номеру абонента А...'
     full_frame['sim_a'] = full_frame['sim_a'].apply(lambda x: check_number(x))
+    uniq_sim_a_names = full_frame['sim_a'].unique().tolist()
+    new_row[SIMA_UNIQ] = len(uniq_sim_a_names)
 
     # ------------------------------------------convert SIM B:
     current_action = 'Форматування записів номерів співрозмовників...'
@@ -517,17 +522,29 @@ def burning(info_row, dict_address_bs, dict_azimuth):
     if list(full_frame.columns).count('sim_b') == 0 and list(full_frame.columns).count('ip') == 1:
         full_frame['sim_b'] = full_frame['ip']
 
+    new_row[SIMB_UNIQ] = full_frame['sim_b'].nunique()
+
     # -----------------------------------------convert IMEI A|B:
     current_action = 'Форматування записів номерів ІМЕІ...'
     if list(full_frame.columns).count('imei_a') > 0:
         full_frame['imei_a'] = full_frame['imei_a'].apply(lambda x: check_imei(x))
+        new_row[IMEIA_UNIQ] = full_frame['imei_a'].nunique()
+    else:
+        new_row[IMEIA_UNIQ] = 0
+
     if list(full_frame.columns).count('imei_b') > 0:
         full_frame['imei_b'] = full_frame['imei_b'].apply(lambda x: check_imei(x))
+        new_row[IMEIB_UNIQ] = full_frame['imei_b'].nunique()
+    else:
+        new_row[IMEIB_UNIQ] = 0
 
     # ------------------------------------------convert LAC|CID:
     current_action = 'Перевірка правильності записів LAC - Cell ID...'
     if list(full_frame.columns).count('lac_a') > 0:
         full_frame['lac_a'] = full_frame['lac_a'].apply(lambda x: check_laccid(x))
+        new_row[LAC_UNIQ] = full_frame['lac_a'].nunique()
+    else:
+        new_row[LAC_UNIQ] = 0
     if list(full_frame.columns).count('lac_b') > 0:
         full_frame['lac_b'] = full_frame['lac_b'].apply(lambda x: check_laccid(x))
     if list(full_frame.columns).count('cid_a') > 0:

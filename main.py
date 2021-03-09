@@ -163,7 +163,7 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         # Сигнал оновлення статусбару:
         self.win_settings.signal.signal_update_statusbar.connect(self.print_statusbar)
         # Підключення кнопки СТАРТУ КОНВЕРТУВАННЯ:
-        self.ui.btn_sheet_start_convert.clicked.connect(self.start_converting)
+        self.ui.btn_sheet_start_convert.clicked.connect(self.start_convert)
         #
 
     # -----------------------------------------методи ВІДКРИТТЯ ВІКОН --------------------------------------------------
@@ -182,10 +182,13 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         global counter_bs
         global counter_files
         self.win_loading.show()
-        convert_all(availible_sheets_list)
+        # convert_all(availible_sheets_list)
 
 
-
+    def start_convert(self):
+        global availible_sheets_list
+        df, availible_sheets_list = convert_all(availible_sheets_list)
+        self.update_sheets_list()
 
 
     def print_statusbar(self, text):
@@ -911,7 +914,7 @@ class SplashScreen(QtWidgets.QMainWindow):
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.progress)
-        self.timer.start(10)
+        self.timer.start(40)
 
         self.show()
 
@@ -938,8 +941,8 @@ class LoadingScreen(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setWindowModality(2)
 
-        # self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
-        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         #
         self.shadow = QtWidgets.QGraphicsDropShadowEffect(self)
         self.shadow.setBlurRadius(45)
