@@ -272,9 +272,13 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         print('getting def path ' + current_folder)
         file_list = []
         if current_folder != '':
-            for item in os.listdir(current_folder):
-                if item.endswith(supported_types):
-                    file_list.append(item)
+            try:
+                for item in os.listdir(current_folder):
+                    if item.endswith(supported_types):
+                        file_list.append(item)
+            except FileNotFoundError:
+                print('Помилка доступу до папки, можливо типова папка видалена')
+                self.open_modalwin_import_folder()
         else:
             self.open_modalwin_import_folder()
         if file_list is not []:
