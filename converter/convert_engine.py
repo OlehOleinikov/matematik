@@ -226,6 +226,7 @@ def convert_all(files_sheet: list):
     # ---ОПРАЦЮВАННЯ ДОВІДНИКІВ БС---
     # -------------------------------
     for row in range(len(sheets_list_uploaded)):
+        sheets_list_uploaded[row][TAB_LOG] = ''
         try:
             temp_dict_adr, temp_dict_azi, errors = search_bs_voc(sheets_list_uploaded[row])
             # повертаються два словники для проставлення адрес БС у таблицях, помилки додаються до відомостей полотна
@@ -235,12 +236,12 @@ def convert_all(files_sheet: list):
                 sheets_list_uploaded[row][BS_UNIQ] = len(temp_dict_adr)
                 sheets_list_uploaded[row][BS_ADR_FIND] = len(temp_dict_adr)
                 sheets_list_uploaded[row][TYPE_FOUND] = "Довідник БС"
+                if errors != '':
+                    sheets_list_uploaded[row][TAB_LOG] = str(sheets_list_uploaded[row][TAB_LOG]) + str(errors)
                 sheets_list_uploaded[row][TAB_LOG] = str(sheets_list_uploaded[row][TAB_LOG]) \
                                                      + '\nДо опрацювання файлів додано відомості про розміщення ' \
                                                        'базових станцій зв\'язку у кількості - ' \
                                                      + str(len(temp_dict_adr))
-                if errors != '':
-                    sheets_list_uploaded[row][TAB_LOG] = str(sheets_list_uploaded[row][TAB_LOG]) + str(errors)
                 bs_files.append(sheets_list_uploaded[row][FILE_PATH])
                 counter_bs += file_weight
         except ValueError as ex:
@@ -254,6 +255,7 @@ def convert_all(files_sheet: list):
             counter_bs += file_weight
     counter_bs = 100
 
+
     # ------------------------------
     # -----ОПРАЦЮВАННЯ ТАБЛИЦЬ -----
     # ------------------------------
@@ -266,7 +268,10 @@ def convert_all(files_sheet: list):
             sheets_list_uploaded[row] = new_row
             main_data_frame = pd.concat([main_data_frame, temp_df], ignore_index=True, sort=False)
             counter_files += file_weight
-        except Exception:
+        except Exception as burn_ex:
+            print('EXCEPTION')
+            print(burn_ex)
+            sheets_list_uploaded[row][TAB_LOG] = 'Критична помилка у функції burning - ' + str(burn_ex)
             counter_files += file_weight
 
     counter_files = 99
@@ -446,12 +451,12 @@ def burning(info_row, dict_address_bs, dict_azimuth):
         ks_voc_status = True
 
     # Перевірка на тип АБ (для подальшого виділення записів по Б та конвертування їх до загального датафрейму)
-    if col_list.count('adr_b') == 1:
-        if len(temp_frame["adr_b"].unique()) > 3:
+    if 'adr_b' in col_list:
+        if len(full_frame["adr_b"].unique()) > 3:
             abon_b_adr_status = True
 
     # Перевірка злиття ЛАК-СІД:
-    if col_list.count('lac_cid') == 1 and col_list.count('lac') == 0 and col_list.count('cid') == 0:
+    if 'lac_cid' in col_list and 'lac_a' not in col_list and 'cid_a' not in col_list:
         lac_cid_merged_status = True
 
     # --------------------------------------------convert TYPE:
@@ -526,13 +531,13 @@ def burning(info_row, dict_address_bs, dict_azimuth):
 
     # -----------------------------------------convert IMEI A|B:
     current_action = 'Форматування записів номерів ІМЕІ...'
-    if list(full_frame.columns).count('imei_a') > 0:
+    if 'imei_a' in col_list:
         full_frame['imei_a'] = full_frame['imei_a'].apply(lambda x: check_imei(x))
         new_row[IMEIA_UNIQ] = full_frame['imei_a'].nunique()
     else:
         new_row[IMEIA_UNIQ] = 0
 
-    if list(full_frame.columns).count('imei_b') > 0:
+    if 'imei_b' in col_list:
         full_frame['imei_b'] = full_frame['imei_b'].apply(lambda x: check_imei(x))
         new_row[IMEIB_UNIQ] = full_frame['imei_b'].nunique()
     else:
@@ -540,16 +545,19 @@ def burning(info_row, dict_address_bs, dict_azimuth):
 
     # ------------------------------------------convert LAC|CID:
     current_action = 'Перевірка правильності записів LAC - Cell ID...'
-    if list(full_frame.columns).count('lac_a') > 0:
+    if 'lac_a' in col_list:
         full_frame['lac_a'] = full_frame['lac_a'].apply(lambda x: check_laccid(x))
-        new_row[LAC_UNIQ] = full_frame['lac_a'].nunique()
+        lacs_list = full_frame['lac_a'].unique().tolist()
+        if '' in lacs_list:
+            lacs_list.remove('')  # для точності кількості ЛАК (порожні рядки заповнені "")
+        new_row[LAC_UNIQ] = len(lacs_list)
     else:
         new_row[LAC_UNIQ] = 0
-    if list(full_frame.columns).count('lac_b') > 0:
+    if 'lac_b' in col_list:
         full_frame['lac_b'] = full_frame['lac_b'].apply(lambda x: check_laccid(x))
-    if list(full_frame.columns).count('cid_a') > 0:
+    if 'cid_a' in col_list:
         full_frame['cid_a'] = full_frame['cid_a'].apply(lambda x: check_laccid(x))
-    if list(full_frame.columns).count('cid_b') > 0:
+    if 'cid_b' in col_list:
         full_frame['cid_b'] = full_frame['cid_b'].apply(lambda x: check_laccid(x))
 
     # -------------------------------USE KYIVSTAR BS HANDBOOK:

@@ -71,6 +71,7 @@ default_config['main_frame_columns_set'] = {
     'sim_b': 'Абонент Б',
     'lac_a': 'LAC A',
     'cid_a': 'Cid A',
+    'lac_cid': 'Унікальний номер базової станції',
     'az_a': 'Аз.А',
     'adr_a': 'Адреса А'
 }

@@ -179,16 +179,15 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         mw.show()
 
     def start_converting(self):
-        global counter_bs
-        global counter_files
         self.win_loading.show()
         # convert_all(availible_sheets_list)
 
-
     def start_convert(self):
         global availible_sheets_list
-        df, availible_sheets_list = convert_all(availible_sheets_list)
+        global main_app_df
+        main_app_df, availible_sheets_list = convert_all(availible_sheets_list)
         self.update_sheets_list()
+        print('Records loaded: ' + str(main_app_df.shape[0]))
 
 
     def print_statusbar(self, text):
@@ -918,7 +917,7 @@ class SplashScreen(QtWidgets.QMainWindow):
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.progress)
-        self.timer.start(40)
+        self.timer.start(5)
 
         self.show()
 
