@@ -1,3 +1,5 @@
+from config.const_conv import *
+
 import numpy as np
 from lxml import etree as et
 
@@ -11,49 +13,11 @@ counter_files = 0  # відсоток опрацьованих файлів з �
 current_file = ''
 current_action = ''
 
-FILE_PATH = 0
-FILE_NAME = 1
-FILE_SIZE = 2
-FILE_FOOTPRINT = 3
-RECORDS_DETECTED = 4
-RECORDS_CONVERTED = 5
-COLUMNS_DETECTED = 6
-COLUMNS_CONVERTED = 7
-TYPES_DETECTED = 8
-TYPES_CONVERTED = 9
-SIMA_UNIQ = 10
-SIMB_UNIQ = 11
-IMEIA_UNIQ = 12
-IMEIB_UNIQ = 13
-LAC_UNIQ = 14
-BS_UNIQ = 15
-BS_ADR_FIND = 16
-FUNC_SIM_CHOICE = 17
-FUNC_FORW_CHOICE = 18
-FUNC_BS_VOC = 19
-TYPE_FOUND = 20
-TAB_LOG = 21
-
 DEEP = 100  # num of rows for testing tab's type
 
 # -------------------------------------------------------------------------------------
 # ---------------------------------PROGRAM SETTINGS VARS-------------------------------
 # -------------------------------------------------------------------------------------
-
-#Список з файлами для опрацювання. Отримується з файлів обраних користувачем в діалоговому вікні.
-#Перевіряється на повторне введення одного й того ж файлу.
-#Зберігає відомості про файл: абсолютний шлях(0), назва файлу(1), розмір(2), Колонки(3), Типи (4), Соти(5), Тип(6)
-#До перегону таблиць містить відомості тільки про шлях, назву файлу та розмір:
-# sheets_list_prepared = []
-
-
-su_text_search = True  # setup to parse txt files in directory
-su_save_heap = True
-su_save_file_to_file = True
-su_save_divide_by_subscriber = True
-su_merge_ab_types = True
-su_sort_subscriber = False
-su_sort_datetime = True
 
 # -------------------------------------------------------------------------------------
 # ------------------------------HELPERS VARS (SERVICE VARS)----------------------------
@@ -233,8 +197,8 @@ def convert_all(files_sheet: list):
             if temp_dict_adr is not None:
                 dict_bs_adr.update(temp_dict_adr)
                 dict_bs_azi.update(temp_dict_azi)
-                sheets_list_uploaded[row][BS_UNIQ] = len(temp_dict_adr)
-                sheets_list_uploaded[row][BS_ADR_FIND] = len(temp_dict_adr)
+                sheets_list_uploaded[row][BS_A_UNIQ] = len(temp_dict_adr)
+                sheets_list_uploaded[row][ADR_A_UNIQ] = len(temp_dict_adr)
                 sheets_list_uploaded[row][TYPE_FOUND] = "Довідник БС"
                 if errors != '':
                     sheets_list_uploaded[row][TAB_LOG] = str(sheets_list_uploaded[row][TAB_LOG]) + str(errors)
@@ -390,7 +354,6 @@ def burning(info_row, dict_address_bs, dict_azimuth):
             new_row[TYPE_FOUND] = 'Не розпізнано'
             new_row[TAB_LOG] = 'Формат не підтримується'
             return new_row, None
-        new_row[RECORDS_DETECTED] = full_frame.shape[0]
         new_row[COLUMNS_DETECTED] = full_frame.shape[1]
     except Exception as parse_error_ex:
         print('Переривання функції завантаження датафрейму з файлу ' + str(info_row[FILE_NAME]) + ', виключення:')
@@ -398,11 +361,8 @@ def burning(info_row, dict_address_bs, dict_azimuth):
         new_row[TYPE_FOUND] = 'Не розпізнано'
         new_row[TAB_LOG] = 'Критична помилка парсеру, виключення: ' + str(parse_error_ex)
         return new_row, None
-    print(new_row)
     # Пошук заголовків по першим записам таблиці
     header_row, headers_located = find_header_in_df(dict_columns, temp_frame)
-    print(header_row)
-    print(headers_located)
     if header_row is None:
         new_row[TYPE_FOUND] = 'Не розпізнано'
         new_row[TAB_LOG] = 'Не виявлено заголовки колонок'
@@ -412,6 +372,7 @@ def burning(info_row, dict_address_bs, dict_azimuth):
     # Перейменування заголовків для аналізу:
     start_columns_names_list = full_frame.iloc[header_row]  # встановлення заголовку первинного
     full_frame = full_frame[header_row+1:]
+    new_row[RECORDS_DETECTED] = full_frame.shape[0]
     full_frame = full_frame.rename(columns=start_columns_names_list)  # відмежування (видалення) записів до заголовку
     full_frame.columns = full_frame.columns.str.lower()  # для співставлення зі словником (ключі ловеркейс)
     full_frame.rename(columns=dict_columns, inplace=True)  # застосування словника для перейменування
@@ -533,13 +494,19 @@ def burning(info_row, dict_address_bs, dict_azimuth):
     current_action = 'Форматування записів номерів ІМЕІ...'
     if 'imei_a' in col_list:
         full_frame['imei_a'] = full_frame['imei_a'].apply(lambda x: check_imei(x))
-        new_row[IMEIA_UNIQ] = full_frame['imei_a'].nunique()
+        imei_a_list = full_frame['imei_a'].unique().tolist()
+        if '' in imei_a_list:
+            imei_a_list.remove('')  # для точності кількості BS (порожні рядки заповнені "")
+        new_row[IMEIA_UNIQ] = len(imei_a_list)
     else:
         new_row[IMEIA_UNIQ] = 0
 
     if 'imei_b' in col_list:
         full_frame['imei_b'] = full_frame['imei_b'].apply(lambda x: check_imei(x))
-        new_row[IMEIB_UNIQ] = full_frame['imei_b'].nunique()
+        imei_b_list = full_frame['imei_b'].unique().tolist()
+        if '' in imei_b_list:
+            imei_b_list.remove('')  # для точності кількості BS (порожні рядки заповнені "")
+        new_row[IMEIB_UNIQ] = len(imei_b_list)
     else:
         new_row[IMEIB_UNIQ] = 0
 
@@ -547,12 +514,6 @@ def burning(info_row, dict_address_bs, dict_azimuth):
     current_action = 'Перевірка правильності записів LAC - Cell ID...'
     if 'lac_a' in col_list:
         full_frame['lac_a'] = full_frame['lac_a'].apply(lambda x: check_laccid(x))
-        lacs_list = full_frame['lac_a'].unique().tolist()
-        if '' in lacs_list:
-            lacs_list.remove('')  # для точності кількості ЛАК (порожні рядки заповнені "")
-        new_row[LAC_UNIQ] = len(lacs_list)
-    else:
-        new_row[LAC_UNIQ] = 0
     if 'lac_b' in col_list:
         full_frame['lac_b'] = full_frame['lac_b'].apply(lambda x: check_laccid(x))
     if 'cid_a' in col_list:
@@ -560,7 +521,32 @@ def burning(info_row, dict_address_bs, dict_azimuth):
     if 'cid_b' in col_list:
         full_frame['cid_b'] = full_frame['cid_b'].apply(lambda x: check_laccid(x))
 
-    # -------------------------------USE KYIVSTAR BS HANDBOOK:
+    if 'lac_a' in col_list and 'cid_a' in col_list and 'lac_cid' not in col_list:
+        full_frame['lac_cid'] = full_frame['lac_a'].astype(str) + '-' + full_frame['cid_a'].astype(str)
+
+    if 'lac_cid' in full_frame.columns:
+        bs_list = full_frame['lac_cid'].tolist()
+        while '' in bs_list:
+            bs_list.remove('')  # для точності кількості BS (порожні рядки заповнені "")
+        while '-' in bs_list:
+            bs_list.remove('-')  # для точності кількості BS (порожні рядки заповнені "-")
+        new_row[BS_A_UNIQ] = len(bs_list)
+    else:
+        new_row[BS_A_UNIQ] = 0
+    
+    if 'lac_b' in col_list and 'cid_b' in col_list and 'lac_cid_b' not in col_list:
+        full_frame['lac_cid_b'] = full_frame['lac_b'].astype(str) + '-' + full_frame['cid_b'].astype(str)
+
+    if 'lac_cid_b' in full_frame.columns:
+        bs_list_b = full_frame['lac_cid_b'].tolist()
+        while '' in bs_list_b:
+            bs_list_b.remove('')  # для точності кількості BS (порожні рядки заповнені "")
+        while '-' in bs_list_b:
+            bs_list_b.remove('-')  # для точності кількості BS (порожні рядки заповнені "-")
+        new_row[BS_B_UNIQ] = len(bs_list_b)
+    else:
+        new_row[BS_B_UNIQ] = 0
+        # -------------------------------USE KYIVSTAR BS HANDBOOK:
     if ks_voc_status is True and len(dict_address_bs) > 0:
         current_action = 'Доповнення таблиці записами довідників базових станцій...'
         full_frame['adr_a'] = full_frame.apply(lambda x: combine_lac_cid(x), axis=1)
@@ -569,10 +555,23 @@ def burning(info_row, dict_address_bs, dict_azimuth):
         full_frame['az_a'] = full_frame['az_a'].map(dict_azimuth)
 
     # -----------------------------FILL NAN BS & AZIMUTH CELLS:
-    if list(full_frame.columns).count('adr_a') > 0:
+    if 'adr_a' in full_frame.columns:
         full_frame['adr_a'] = full_frame['adr_a'].fillna('')
-    if list(full_frame.columns).count('adr_b') > 0:
+        adr_a_list = full_frame['adr_a'].tolist()
+        while '' in adr_a_list:
+            adr_a_list.remove('')  # для точності кількості BS (порожні рядки заповнені "")
+        new_row[ADR_A_UNIQ] = len(adr_a_list)
+    else:
+        new_row[ADR_A_UNIQ] = 0
+        
+    if 'adr_b' in full_frame.columns:
         full_frame['adr_b'] = full_frame['adr_b'].fillna('')
+        adr_b_list = full_frame['adr_a'].tolist()
+        while '' in adr_b_list:
+            adr_b_list.remove('')  # для точності кількості BS (порожні рядки заповнені "")
+        new_row[ADR_B_UNIQ] = len(adr_b_list)
+    else:
+        new_row[ADR_B_UNIQ] = 0
 
     # ------------------------------------------convert AZIMUTH:
     current_action = 'Перевірка правильності значень азимутів БС...'
@@ -602,5 +601,5 @@ def burning(info_row, dict_address_bs, dict_azimuth):
 
     # -----------------------------------------KILL DUPLICATES:
     full_frame.drop_duplicates(inplace=True, ignore_index=True)
-    print(new_row)
+    new_row[RECORDS_CONVERTED] = full_frame.shape[0]
     return new_row, full_frame

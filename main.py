@@ -1,5 +1,7 @@
 import sys
-# from temp.fake import fake_func
+from config.const_conv import *
+
+
 
 from gui.gui import *
 from gui.gui_settings import Ui_Form
@@ -32,6 +34,7 @@ prog_execute_stage = 0  # етапи програми для відображе�
 supported_types = ('.xls', '.xlsx', '.xml', '.txt', '.csv', '.txt', '.dec')
 
 
+
 availible_sheets_list = []  # список файлів для конвертування та результати опрацювання (детально в tasks.py)
 main_app_df = pd.DataFrame()  # конвертовані дані з усіх файлів (для подальшого експорту або аналізу)
 subscriber_a_list = []  # список всіх знайдених цільових абонентів (основні абоненти у файлі)
@@ -60,7 +63,7 @@ class ModelSheetsListView(QtCore.QAbstractTableModel):
         QtCore.QAbstractTableModel.__init__(self)
         self.gui = parent
         self.input_files_default_headers_set = ['Файл', 'Розмір', 'Записи', 'Колонки', 'Типи', 'SIM\nА/Б',
-                                           'ІМЕІ\nА/Б', 'LAC', 'БС/Адрес', 'Визначений тип']
+                                           'ІМЕІ\nА/Б', 'БС/Адрес А', 'БС/Адрес Б', 'Визначений тип']
 
         for row in input_data:  # додавання порожніх клітинок для уникнення помилки IndexError при відображенні
             if len(row) < len(self.input_files_default_headers_set):
@@ -69,9 +72,16 @@ class ModelSheetsListView(QtCore.QAbstractTableModel):
         self.colLabels = self.input_files_default_headers_set
         self.converted_data = []
         for row in input_data:
-            new_row = [row[1], row[2], str(row[4])+'/'+str(row[5]), str(row[6])+'/'+str(row[7]), str(row[8])+
-                       '/'+str(row[9]), str(row[10])+'/'+str(row[11]), str(row[12])+'/'+str(row[13]), row[14],
-                       str(row[15])+'/'+str(row[16]), row[20]]
+            new_row = [row[FILE_NAME],
+                       row[FILE_SIZE],
+                       str(row[RECORDS_DETECTED])+' / '+str(row[RECORDS_CONVERTED]),
+                       str(row[COLUMNS_DETECTED])+' / '+str(row[COLUMNS_CONVERTED]),
+                       str(row[TYPES_DETECTED])+ ' / '+str(row[TYPES_CONVERTED]),
+                       str(row[SIMA_UNIQ])+' / '+str(row[SIMB_UNIQ]),
+                       str(row[IMEIA_UNIQ])+' / '+str(row[IMEIB_UNIQ]),
+                       str(row[BS_A_UNIQ])+' / '+str(row[ADR_A_UNIQ]),
+                       str(row[BS_B_UNIQ])+' / '+str(row[ADR_B_UNIQ]),
+                       row[TYPE_FOUND]]
             self.converted_data.append(new_row)
         self.cached = self.converted_data
 
@@ -223,6 +233,8 @@ class MainWinMatematik(QtWidgets.QMainWindow):
         self.widget_sheets_table_view.setModel(self.sheets_view_object)
         self.widget_sheets_table_view.resizeColumnToContents(0)
         self.widget_sheets_table_view.resizeColumnToContents(1)
+        for num in range(2, 9, 1):
+            self.widget_sheets_table_view.setColumnWidth(num, 90)
         self.widget_sheets_table_view.update()
         self.upd_btn_converter_start()
         # self.widget_sheets_table_view.resizeColumnToContents(1)
@@ -248,7 +260,8 @@ class MainWinMatematik(QtWidgets.QMainWindow):
             if file_footprint in [results[3] for results in incoming_sheets_list]:
                 pass
             else:
-                incoming_sheets_list.append([file_path, file_name, file_size, file_footprint, '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'])
+                incoming_sheets_list.append([file_path, file_name, file_size, file_footprint, '-', '-', '-', '-', '-',
+                                             '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '', ''])
         availible_sheets_list = incoming_sheets_list
         print(incoming_sheets_list)
         self.update_sheets_list()
@@ -288,7 +301,8 @@ class MainWinMatematik(QtWidgets.QMainWindow):
                 if file_footprint in [results[3] for results in new_sheets_list]:
                     pass
                 else:
-                    new_sheets_list.append([file_path, file, file_size, file_footprint, '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'])
+                    new_sheets_list.append([file_path, file, file_size, file_footprint, '-', '-', '-', '-', '-', '-',
+                                            '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '', ''])
             availible_sheets_list = new_sheets_list
             print(new_sheets_list)
             self.update_sheets_list()
